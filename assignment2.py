@@ -99,38 +99,34 @@ class C():
                 break
         self.converged = False
 
+fig, axs = plt.subplots(1, 1)
 
+# parameter that controls the shape of the cluster. Higher -> more stretched out
+eta = 1
 N = 100
-etas = [0.5, 1, 1.5, 2]
-fig, axs = plt.subplots(2, 2)
-axs = axs.flatten()
-cntr = 0
+c = C(seed=[N//2, N - 1], N=N, eta=eta)
+while (c.converged == False):
+    c.update()
 
-# compute DLA for all eta's
-for eta in etas:
-    c = C(seed=[N//2, N - 1], N=N, eta=eta)
+# number of cluster points
+for i in range(250):
+    if i % 10 == 0:
+        print(i)
+    c.growth()
+
     while (c.converged == False):
         c.update()
-    c.eta = eta
 
-    for i in range(250):
-        if i % 10 == 0:
-            print(i)
-        c.growth()
+for i in range(N):
+    for j in range(N):
+        if c.cluster[i][j] == 1:
+            c.c[i][j] = float('nan')
 
-        while (c.converged == False):
-            c.update()
+im = axs.imshow(c.c)
+axs.set_title("eta = " + str(eta))
+axs.set_xlabel("x position [-]")
+axs.set_ylabel("y position [-]")
 
-    for i in range(N):
-        for j in range(N):
-            if c.cluster[i][j] == 1:
-                c.c[i][j] = float('nan')
-
-    im = axs[cntr].imshow(c.c)
-    axs[cntr].set_title("eta = " + str(eta))
-    axs[cntr].set_xlabel("x position [-]")
-    axs[cntr].set_ylabel("y position [-]")
-    cntr += 1
 
 
 fig.colorbar(im, ax=axs)
