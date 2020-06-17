@@ -25,21 +25,19 @@ class State:
 
 class States(list):
     def __init__(self, state_dimensions=[2, 2]):
-
-        self.state_dimensions = state_dimensions
-
-        self.cells_per_state = np.prod(self.state_dimensions)
-        self.total_states = 2 ** self.cells_per_state
-
+        self._state_dimensions = state_dimensions
+        self._cells_per_state = np.prod(self._state_dimensions)
+        self._total_states = 2 ** self._cells_per_state
         self._init_states()
 
-    def _init_states(self):
-        state_combinations = product([0, 1], repeat=self.cells_per_state)
-        self._states = [State(state, self.state_dimensions) for state in state_combinations]
-        self._states.sort()
-
     def index(self, state):
+        print("index")
         return self._states.index(state)
+
+    def _init_states(self):
+        state_combinations = product([0, 1], repeat=self._cells_per_state)
+        self._states = [State(state, self._state_dimensions) for state in state_combinations]
+        self._states.sort()
 
     def __getitem__(self, index):
         return self._states[index]
@@ -49,7 +47,7 @@ class States(list):
             yield state
 
     def __len__(self):
-        return len(self._states)
+        return self._total_states
 
     def __str__(self):
         r = ""
@@ -62,25 +60,25 @@ class RuleTable(list):
     def __init__(self, states):
         self.states = states
 
-        self._rule_table = self.generate_rule_table()
+        self._rule_table = self._generate_rule_table()
 
-    def generate_rule_table(self):
+    def transform(self, state):
+        return states[self[states.index(state)]]
+
+    def _generate_rule_table(self):
         # generate shuffled version
-        states_shuffled = sample(self.states, self.states.total_states)
+        states_shuffled = sample(self.states, len(self.states))
 
         # sort shuffled, so corresponding rows between original
         # and shuffled have same number of 1s and 0s
         states_shuffled = np.sort(states_shuffled)
 
         # generate rule by looking up indexes
-        rule_table = np.empty(self.states.total_states, dtype=int)
+        rule_table = np.empty(len(self.states), dtype=int)
         for i, state in enumerate(states_shuffled):
             rule_table[i] = states.index(state)
 
         return rule_table
-
-    def transform(self, state):
-        return states[self[states.index(current_state)]]
 
     def __getitem__(self, index):
         return self._rule_table[index]
