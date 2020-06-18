@@ -2,13 +2,10 @@
 
 import random
 import time
-from copy import deepcopy
-
-import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import cm
-from matplotlib.colors import LinearSegmentedColormap, ListedColormap
+
+from neuronal_tree import Node, Tree
 
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -37,10 +34,10 @@ class C():
         self.clusters = {tuple([x//2, y-1, z//2])}
         self.candidates = {tuple([x//2, y-1, z//2])}  # (y, x) from top left
 
+        self.cluster_test = Tree([x//2, y - 1, z//2], bounds = [[0, x], [0, y], [0, z]])
 
 
-
-    def neighbours(self, x, y, z):
+    def neighbour2d(self, x, y, z):
         if x + 1 < self.x - 1:
             xp = x + 1
         else:
@@ -65,8 +62,25 @@ class C():
 
     # compute the new value for the point
     def SOR(self, x, y, z):
-        xp, xm, zp, zm = self.neighbours(x, y, z)
+        xp, xm, zp, zm = self.neighbour2d(x, y, z)
         return self.w/6 * (self.c[x][y + 1][z] + self.c[x][y - 1][z] + self.c[x][y][zm] + self.c[x][y][zp] + self.c[xp][y][z] + self.c[xm][y][z] + ((1 - self.w) * self.c[x][y][z]))
+
+    def neighbouring_cluster(self, x, y, z):
+        neighbours = {
+        (x + 1, y, z),
+        (x - 1, y, z),
+        (x, y + 1, z),
+        (x, y - 1, z),
+        (x, y, z + 1),
+        (x, y, z - 1)
+        }
+        neigh_clust = []
+        for neighbour in neighbours:
+            # print("neigh", neighbour, self.cluster_test._coords_list)
+            if list(neighbour) in self.cluster_test:
+                neigh_clust.append(neighbour)
+
+        return neigh_clust
 
     def update(self):
         # update the matrix
@@ -111,8 +125,12 @@ class C():
                 g_candidates.add(tuple([i, j, k + 1]))
         self.candidates = self.candidates | g_candidates  
 
+
+    def parent(self, coords):
+        pass
+
     # take a growth step
-    def growth(self):
+    def growth(self, creation_time):
         self.growth_candidates()
 
         c_sum = 0
@@ -129,25 +147,38 @@ class C():
             if (combined_c / c_sum) > rndm:
                 self.clusters.add(tuple([i, j, k]))
                 self.cluster[i][j][k] = 1
+
+                # print(self.neighbouring_cluster(i, j, k))
+                parent_coords = random.choice(self.neighbouring_cluster(i, j, k))
+
+                for x in range(len(self.cluster_test._coords_list)):
+                    if self.cluster_test._coords_list[x] == list(parent_coords):
+     
+                        addednode = self.cluster_test.add([i, j, k], creation_time, self.cluster_test._node_list[x])
+
+                # print(self.cluster_test, "final")
                 break
         self.converged = False
 
 # parameter that controls the shape of the cluster. Higher -> more stretched out
 eta = 3
-x, y, z = [40, 70, 40]
+x, y, z = [30, 50, 30]
 
 
 c = C(seed=[x//2, x - 1], x = x, y = y, z = z, eta=eta, w = 1)
 while c.converged == False:
     c.update()
 
-for i in range(100):
+for i in range(5):
     if i % 10 == 0:
         print(i)
-    c.growth()
+    c.growth(i + 1)
 
     while (c.converged == False):
         c.update()
+
+
+
 
 # for i in range(x):
 #     for j in range(y):
@@ -173,7 +204,6 @@ for i in range(x):
                 print(1 - (abs(i - x//2)/x), i, x//2)
                 side[j][k] += 1 * (1 - (abs(i - x//2)) / x)
 ax.imshow(side)
-# plt.show()
 
 
 
@@ -189,9 +219,11 @@ ax.set_zlabel("z")
 clusters = list(c.clusters)
 for x, y, z in clusters:
     ax.scatter(x, y, z)
-ax.view_init(0, 180)
-plt.show()
+ax.view_init(0, 0)
+
+
+
 # fig.colorbar(im, ax=axs)
-# t2 = time.time()
-# print(t2-t1, "TIME")
-# plt.show()
+t2 = time.time()
+print(t2-t1, "TIME")
+plt.show()
