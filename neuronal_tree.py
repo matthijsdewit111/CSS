@@ -68,6 +68,19 @@ class Tree:
     def get_root(self):
         return self._root
 
+    def _get_neighbours(self, coords):
+        # calculate coords of all neighbours around a center coord
+        neighbours = np.zeros((2*self._dimensionality, self._dimensionality), dtype=int)
+        for i in range(self._dimensionality):
+            j = i * 2
+            neighbours[j:j+2, i] = [-1, 1]
+            neighbours[j] = neighbours[j] + coords
+            neighbours[j+1] = neighbours[j+1] + coords
+        neighbours = neighbours.tolist()
+
+        # return nodes that are neighbours
+        return [node for node in self if node.coords in neighbours]
+
     def _plot2d(self):
         N = len(self._matrix_form)
 
@@ -80,7 +93,7 @@ class Tree:
 
         # plot in 2D
         fig, axs = plt.subplots(1, 1)
-        axs.imshow(matrix_conv, cmap = 'cubehelix')
+        axs.imshow(matrix_conv, cmap='cubehelix')
         axs.set_title("2D plot")
         axs.set_xlabel("x position [-]")
         axs.set_ylabel("y position [-]")
@@ -121,6 +134,8 @@ if __name__ == "__main__":
     another_node = tree2d.add([5, 2], 4, some_node)
     tree2d.add([5, 3], 5, another_node)
     tree2d.plot()
+
+    print(tree2d._get_neighbours([6, 2]))
 
     # plot a 3d test tree
     tree3d = Tree([5, 0, 5], bounds=[[0, 10], [0, 10], [0, 10]])
