@@ -69,7 +69,6 @@ class Tree:
         return self._root
 
     def _plot2d(self):
-        print(self._matrix_form)
         N = len(self._matrix_form)
 
         # convert all 1s in matrix to nans
@@ -90,9 +89,9 @@ class Tree:
     def _plot3d(self):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.set_xlim(0, self.bounds[0][1])
-        ax.set_ylim(0, self.bounds[1][1])
-        ax.set_zlim(0, self.bounds[2][1])
+        ax.set_xlim(*self.bounds[0])
+        ax.set_ylim(*self.bounds[1])
+        ax.set_zlim(*self.bounds[2])
         ax.set_xlabel("x")
         ax.set_ylabel("y")
         ax.set_zlabel("z")
@@ -100,7 +99,7 @@ class Tree:
         for node in self:
             if node.parent_node:
                 parent = node.parent_node
-                ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c = 'black')
+                ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='black')
         plt.show()
 
     def __iter__(self):
@@ -114,18 +113,20 @@ class Tree:
 
 
 if __name__ == "__main__":
-    tree = Tree([5, 0], bounds=[[0, 10], [0, 10]])
+    # plot a 2d test tree
+    tree2d = Tree([5, 0], bounds=[[0, 10], [0, 10]])
+    some_node = tree2d.add([5, 1], 1, tree2d.get_root())
+    tree2d.add([6, 1], 2, tree2d.get_root())
+    tree2d.add([4, 1], 3, tree2d.get_root())
+    another_node = tree2d.add([5, 2], 4, some_node)
+    tree2d.add([5, 3], 5, another_node)
+    tree2d.plot()
 
-    rn = tree.add([5, 1], 1, tree.get_root())
-    tree.add([6, 1], 2, tree.get_root())
-    tree.add([4, 1], 3, tree.get_root())
-
-    rn2 = tree.add([5, 2], 4, rn)
-    tree.add([5, 3], 5, rn2)
-
-    # print(tree)
-
-    for node in tree:
-        print(node)
-
-    tree.plot()
+    # plot a 3d test tree
+    tree3d = Tree([5, 0, 5], bounds=[[0, 10], [0, 10], [0, 10]])
+    some_node = tree3d.add([5, 1, 5], 1, tree3d.get_root())
+    tree3d.add([6, 1, 5], 2, tree3d.get_root())
+    tree3d.add([4, 1, 5], 3, tree3d.get_root())
+    another_node = tree3d.add([5, 2, 5], 4, some_node)
+    tree3d.add([5, 3, 4], 5, another_node)
+    tree3d.plot()
