@@ -53,21 +53,6 @@ class C():
 
     # walk untill stuck to a candidate
     def walker(self, p_stick):
-        # N = 1500
-        # R = (np.random.rand(N)*6).astype("int")
-        # x = np.zeros(N)
-        # y = np.zeros(N)
-        # z = np.zeros(N)
-        # x[ R==0 ] = -1; x[ R==1 ] = 1 #assigning the axis for each variable to use
-        # y[ R==2 ] = -1; y[ R==3 ] = 1
-        # z[ R==4 ] = -1; z[ R==5 ] = 1
-        # x = np.cumsum(x) #The cumsum() function is used to get cumulative sum over a DataFrame or Series axis i.e. it sums the steps across for eachaxis of the plane.
-        # y = np.cumsum(y)
-        # z = np.cumsum(z)
-
-        # release at random x-position
-        # walker_p = [x[0], y[0], z[0]]
-
 
         # create walker
         rndm1 = random.randrange(self.N)
@@ -78,15 +63,9 @@ class C():
         self.walking = True
         no_match = True
         check_stick = True
-        attempt = 1
-
 
         # while not sticking
         while no_match == True:
-            # print(walker_p)
-
-            # print("attempt ", attempt)
-            attempt += 1
             rndm_direc = random.randrange(6)
 
             # take step in direction UP
@@ -145,11 +124,6 @@ class C():
                 else:
                     rndm = random.randrange(self.N)
                     walker_p= [0, rndm, walker_p[2]]
-                # else:
-                #     if self.check_move(tuple([walker_p[0], walker_p[1], walker_p[2] - 1])):
-                #         walker_p = [walker_p[0], walker_p[1], walker_p[2] - 1]
-                #     else:
-                #         check_stick = False
 
             # take step in direction BACK
             elif rndm_direc == 4:
@@ -163,8 +137,6 @@ class C():
                         walker_p = [walker_p[0], walker_p[1], walker_p[2] + 1]
 
             if check_stick == True:
-                # print("STICK")
-                attempt = 1
                 for i, j, k in self.candidates:
                     if i == walker_p[0] and j == walker_p[1] and k == walker_p[2]:
                         x = random.random()
@@ -174,9 +146,8 @@ class C():
                             no_match = False
                             self.walking = False
                             break
+
             check_stick = True
-
-
 
 
 N = 70
@@ -193,10 +164,8 @@ for i in tqdm(range(250)):
     while (c.walking == True):
         c.walker(p_stick)
     c.walking = True
-#     if i % 10 == 0:
-#         print(i)
 
-
+# cluster
 for i in range(N):
     for j in range(N):
         for k in range(N):
@@ -204,19 +173,11 @@ for i in range(N):
                 c.c[i][j][k] = float('nan')
 
 ## 3D plotting
-# plt.figure()
-# ax = plt.gca(projection='3d')
 fig = plt.figure()
-ax = fig.add_subplot(111,projection='3d')
+ax = fig.add_subplot(111, projection='3d')
 
 for list_of_point in c.clusters:
-    ax.scatter(list_of_point[0],list_of_point[1],list_of_point[2])
-
-
-#
-# ax.set_xticks([0,2,4,6,8,10])
-# ax.set_yticks([0,2,4,6,8,10])
-# ax.set_zticks([0,2,4,6,8,10])
+    ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
 
 ax.axes.set_xlim3d(left=0, right=N)
 ax.axes.set_ylim3d(bottom=0, top=N)
@@ -234,7 +195,7 @@ for i in range(N):
 
 fig, axs = plt.subplots(1, 1)
 axs.imshow(c_list, cmap = 'cubehelix')
-# axs.set_title("P stick : {}".format(p_stick))
+axs.set_title("P stick : {}".format(p_stick))
 axs.set_xlabel("x position [-]")
 axs.set_ylabel("y position [-]")
 plt.show()

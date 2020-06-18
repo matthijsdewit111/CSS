@@ -53,21 +53,6 @@ class C():
 
     # walk untill stuck to a candidate
     def walker(self, p_stick):
-        # N = 1500
-        # R = (np.random.rand(N)*6).astype("int")
-        # x = np.zeros(N)
-        # y = np.zeros(N)
-        # z = np.zeros(N)
-        # x[ R==0 ] = -1; x[ R==1 ] = 1 #assigning the axis for each variable to use
-        # y[ R==2 ] = -1; y[ R==3 ] = 1
-        # z[ R==4 ] = -1; z[ R==5 ] = 1
-        # x = np.cumsum(x) #The cumsum() function is used to get cumulative sum over a DataFrame or Series axis i.e. it sums the steps across for eachaxis of the plane.
-        # y = np.cumsum(y)
-        # z = np.cumsum(z)
-
-        # release at random x-position
-        # walker_p = [x[0], y[0], z[0]]
-
 
         # create list of walkers
         walker_p = []
@@ -82,7 +67,6 @@ class C():
         no_match = True
         check_stick = True
         attempt = 1
-
 
         # while not sticking
         while no_match == True:
@@ -148,11 +132,6 @@ class C():
                     else:
                         rndm = random.randrange(self.N)
                         walker_p[w] = [0, rndm, walker_p[w][2]]
-                    # else:
-                    #     if self.check_move(tuple([walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1])):
-                    #         walker_p = [walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1]
-                    #     else:
-                    #         check_stick = False
 
                 # take step in direction BACK
                 elif rndm_direc == 4:
@@ -180,14 +159,12 @@ class C():
                 check_stick = True
 
 
-
-
 N = 70
 
 # controls the chance of the random walker sticking to the cluster
 # higher means lower chance
 p_stick = 0.2
-c = C(seed = [N//2, N//2, N - 1], N = N)
+c = C(seed = [N//2, N//2, N //2], N = N)
 
 # number of points
 for i in tqdm(range(250)):
@@ -195,6 +172,7 @@ for i in tqdm(range(250)):
         c.walker(p_stick)
     c.walking = True
 
+# cluster
 for i in range(N):
     for j in range(N):
         for k in range(N):
@@ -219,7 +197,7 @@ for i in range(N):
 
 fig, axs = plt.subplots(1, 1)
 axs.imshow(c_list, cmap = 'cubehelix')
-# axs.set_title("P stick : {}".format(p_stick))
+axs.set_title("P stick : {}".format(p_stick))
 axs.set_xlabel("x position [-]")
 axs.set_ylabel("y position [-]")
 plt.show()
