@@ -3,6 +3,8 @@ import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
 
+rng = np.random.default_rng()
+
 
 class Node:
     def __init__(self, coords, creation_time, parent_node):
@@ -54,10 +56,10 @@ class Tree:
         else:
             raise NotImplementedError
 
-    def add(self, coords, creation_time, parent):
+    def add(self, coords, creation_time):
         assert len(coords) == self._dimensionality
 
-        # replace with search an stuff to find a parent node instead of given as argument
+        parent = rng.choice(self._get_neighbours(coords))
         new_node = parent.add_child(coords, creation_time)
         self._node_list.append(new_node)
         self._coords_list.append(coords)
@@ -82,22 +84,38 @@ class Tree:
         return [node for node in self if node.coords in neighbours]
 
     def _plot2d(self):
-        N = len(self._matrix_form)
+        # N = len(self._matrix_form)
 
-        # convert all 1s in matrix to nans
-        matrix_conv = [[0 for i in range(N)] for j in range(N)]
-        for i in range(N):
-            for j in range(N):
-                if self._matrix_form[i][j] == 1:
-                    matrix_conv[i][j] = float('nan')
+        # # convert all 1s in matrix to nans
+        # matrix_conv = [[0 for i in range(N)] for j in range(N)]
+        # for i in range(N):
+        #     for j in range(N):
+        #         if self._matrix_form[i][j] == 1:
+        #             matrix_conv[i][j] = float('nan')
 
-        # plot in 2D
-        fig, axs = plt.subplots(1, 1)
-        axs.imshow(matrix_conv, cmap='cubehelix')
-        axs.set_title("2D plot")
-        axs.set_xlabel("x position [-]")
-        axs.set_ylabel("y position [-]")
+        # # plot in 2D
+        # fig, axs = plt.subplots(1, 1)
+        # axs.imshow(matrix_conv, cmap='cubehelix')
+        # axs.set_title("2D plot")
+        # axs.set_xlabel("x position [-]")
+        # axs.set_ylabel("y position [-]")
+        # plt.show()
+
+
+        fig, ax = plt.subplots(1, 1)
+        ax.set_xlim(*self.bounds[0])
+        ax.set_ylim(*self.bounds[1])
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_title("2D plot")
+
+        for node in self:
+            if node.parent_node:
+                parent = node.parent_node
+                ax.plot([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], c='black')
+        
         plt.show()
+
 
     def _plot3d(self):
         fig = plt.figure()
@@ -128,20 +146,20 @@ class Tree:
 if __name__ == "__main__":
     # plot a 2d test tree
     tree2d = Tree([5, 0], bounds=[[0, 10], [0, 10]])
-    some_node = tree2d.add([5, 1], 1, tree2d.get_root())
-    tree2d.add([6, 1], 2, tree2d.get_root())
-    tree2d.add([4, 1], 3, tree2d.get_root())
-    another_node = tree2d.add([5, 2], 4, some_node)
-    tree2d.add([5, 3], 5, another_node)
+    tree2d.add([5, 1], 1)
+    tree2d.add([6, 1], 2)
+    tree2d.add([4, 1], 3)
+    tree2d.add([5, 2], 4)
+    tree2d.add([5, 3], 5)
     tree2d.plot()
 
     print(tree2d._get_neighbours([6, 2]))
 
     # plot a 3d test tree
     tree3d = Tree([5, 0, 5], bounds=[[0, 10], [0, 10], [0, 10]])
-    some_node = tree3d.add([5, 1, 5], 1, tree3d.get_root())
-    tree3d.add([6, 1, 5], 2, tree3d.get_root())
-    tree3d.add([4, 1, 5], 3, tree3d.get_root())
-    another_node = tree3d.add([5, 2, 5], 4, some_node)
-    tree3d.add([5, 3, 4], 5, another_node)
+    tree3d.add([5, 1, 5], 1)
+    tree3d.add([6, 1, 5], 2)
+    tree3d.add([4, 1, 5], 3)
+    tree3d.add([5, 2, 5], 4)
+    tree3d.add([5, 2, 4], 5)
     tree3d.plot()
