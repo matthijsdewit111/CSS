@@ -39,7 +39,7 @@ class C():
                 g_candidates.add(tuple([i - 1, j]))
             if (i + 1 <= (self.N - 1)):
                 g_candidates.add(tuple([i + 1, j]))
-            
+
         self.candidates = self.candidates | g_candidates
 
     # check if the move doesn't go in the cluster
@@ -48,25 +48,26 @@ class C():
             return False
         else:
             return True
-    
+
     # walk untill stuck to a candidate
     def walker(self, p_stick):
         rndm = random.randrange(self.N)
-        
+
         # release at random x-position
         walker_p = [0, rndm]
         self.growth_candidates()
         self.walking = True
         no_match = True
         check_stick = True
-        
+
         # while not sticking
         while no_match == True:
+            print(walker_p)
             rndm_direc = random.randrange(4) # 0 up, 1 right, 2 down, 3 left
-            
+
             # take step in direction
             if rndm_direc == 0:
-                
+
                 if walker_p[0] - 1 >= 0:
                     if self.check_move(tuple([walker_p[0] - 1, walker_p[1]])):
                         walker_p = [walker_p[0] - 1, walker_p[1]]
@@ -104,6 +105,7 @@ class C():
                         walker_p = [walker_p[0], walker_p[1] - 1]
                     else:
                         check_stick = False
+                        
             if check_stick == True:
                 for i, j in self.candidates:
                     if i == walker_p[0] and j == walker_p[1]:
@@ -120,36 +122,32 @@ class C():
 N = 100
 
 # controls the chance of the random walker sticking to the cluster
-# higher means lower chance 
+# higher means lower chance
 p_stick = 0.5
 fig, axs = plt.subplots(1, 1)
 
 c = C(seed = [N//2, N - 1], N = N)
 
-# number of points 
+# number of points
 for i in range(250):
     while (c.walking == True):
         c.walker(p_stick)
     c.walking = True
     if i % 10 == 0:
         print(i)
-        
-        
+
+
 for i in range(N):
     for j in range(N):
         if c.cluster[i][j] == 1:
             c.c[i][j] = float('nan')
-            
+
 axs.imshow(c.c, cmap = 'cubehelix')
 axs.set_title("P stick : {}".format(p_stick))
 axs.set_xlabel("x position [-]")
 axs.set_ylabel("y position [-]")
 
- 
+
 t2 = time.time()
 print(t2-t1, "TIME")
 plt.show()
-
-
-
-
