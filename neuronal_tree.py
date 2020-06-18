@@ -67,6 +67,22 @@ class Tree:
 
     def _plot2d(self):
         print(self._matrix_form)
+        N = len(self._matrix_form)
+
+        # convert all 1s in matrix to nans
+        matrix_conv = [[0 for i in range(N)] for j in range(N)]
+        for i in range(N):
+            for j in range(N):
+                if self._matrix_form[i][j] == 1:
+                    matrix_conv[i][j] = float('nan')
+
+        # plot in 2D
+        fig, axs = plt.subplots(1, 1)
+        axs.imshow(matrix_conv, cmap = 'cubehelix')
+        axs.set_title("2D plot")
+        axs.set_xlabel("x position [-]")
+        axs.set_ylabel("y position [-]")
+        plt.show()
 
     def _plot3d(self):
         raise NotImplementedError
