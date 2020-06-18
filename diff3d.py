@@ -37,6 +37,7 @@ class C():
         self.cluster_test = Tree([x//2, y - 1, z//2], bounds = [[0, x], [0, y], [0, z]])
 
 
+    # compute the neighbours in x and z direction, accounting for periodic boundaries
     def neighbour2d(self, x, y, z):
         if x + 1 < self.x - 1:
             xp = x + 1
@@ -60,7 +61,7 @@ class C():
 
         return xp, xm, zp, zm
 
-    # compute the new value for the point
+    # compute the new value for the point with Successive Over Relaxation
     def SOR(self, x, y, z):
         xp, xm, zp, zm = self.neighbour2d(x, y, z)
         return self.w/6 * (self.c[x][y + 1][z] + self.c[x][y - 1][z] + self.c[x][y][zm] + self.c[x][y][zp] + self.c[xp][y][z] + self.c[xm][y][z] + ((1 - self.w) * self.c[x][y][z]))
@@ -89,6 +90,8 @@ class C():
             for i in range(self.x):
                 for k in range(self.z):
                     if self.cluster[i][j][k] == 0:
+
+                        # save values to compute the change in value for one iteration
                         original_val = self.c[i][j][k]
                         new_val = self.SOR(i, j, k)
       
@@ -108,6 +111,8 @@ class C():
 
     # compute the growth candidates
     def growth_candidates(self):
+        # create a set for all possible growth candidates
+
         g_candidates = set()
         self.candidates = self.clusters
         for i, j, k in self.candidates:
@@ -126,13 +131,12 @@ class C():
         self.candidates = self.candidates | g_candidates  
 
 
-    def parent(self, coords):
-        pass
 
     # take a growth step
     def growth(self, creation_time):
         self.growth_candidates()
 
+        # variables to determine to which point is being grown
         c_sum = 0
         combined_c = 0
         rndm = random.random()
@@ -141,22 +145,19 @@ class C():
         for i, j, k in self.candidates:
             c_sum += self.c[i][j][k] ** self.eta
 
-        # compute the growth site
+        # compute the growth site concentrations
         for i, j, k in self.candidates:
             combined_c += (self.c[i][j][k] ** self.eta)
             if (combined_c / c_sum) > rndm:
                 self.clusters.add(tuple([i, j, k]))
                 self.cluster[i][j][k] = 1
 
-                # print(self.neighbouring_cluster(i, j, k))
+                # retrieve the parent node
                 parent_coords = random.choice(self.neighbouring_cluster(i, j, k))
-
                 for x in range(len(self.cluster_test._coords_list)):
                     if self.cluster_test._coords_list[x] == list(parent_coords):
-     
-                        addednode = self.cluster_test.add([i, j, k], creation_time, self.cluster_test._node_list[x])
 
-                # print(self.cluster_test, "final")
+                        addednode = self.cluster_test.add([i, j, k], creation_time, self.cluster_test._node_list[x])
                 break
         self.converged = False
 
@@ -169,7 +170,7 @@ c = C(seed=[x//2, x - 1], x = x, y = y, z = z, eta=eta, w = 1)
 while c.converged == False:
     c.update()
 
-for i in range(5):
+for i in range(30):
     if i % 10 == 0:
         print(i)
     c.growth(i + 1)
@@ -177,22 +178,6 @@ for i in range(5):
     while (c.converged == False):
         c.update()
 
-
-
-
-# for i in range(x):
-#     for j in range(y):
-#         for k in range(z):
-#             if c.cluster[i][j][k] == 1:
-#                 c.c[i][j][k] = float('nan')
-
-# fig, ax = plt.subplots(2, 2)
-# axs = ax.flatten()
-# axs[0].imshow(c.c[x//2])
-# axs[1].imshow(c.c[x//2 + 1])
-# axs[2].imshow(c.c[x//2 + 2])
-# axs[3].imshow(c.c[x//2 - 1])
-# plt.show()
 
 fig, ax = plt.subplots(1, 1)
 
@@ -206,22 +191,37 @@ for i in range(x):
 ax.imshow(side)
 
 
+c.cluster_test.plot()
 
+# plot slices
+# for i in range(x):
+#     for j in range(y):
+#         for k in range(z):
+#             if c.cluster[i][j][k] == 1:
+#                 c.c[i][j][k] = float('nan')
+
+# fig, ax = plt.subplots(2, 2)
+# axs = ax.flatten()
+# axs[0].imshow(c.c[x//2])
+# axs[1].imshow(c.c[x//2 + 1])
+# axs[2].imshow(c.c[x//2 + 2])
+# axs[3].imshow(c.c[x//2 - 1])
+# plt.show()
 # 3d plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.set_xlim(0, x)
-ax.set_ylim(0, y)
-ax.set_zlim(0, z)
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("z")
-clusters = list(c.clusters)
-for x, y, z in clusters:
-    ax.scatter(x, y, z)
-ax.view_init(0, 0)
-
-
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.set_xlim(0, x)
+# ax.set_ylim(0, y)
+# ax.set_zlim(0, z)
+# ax.set_xlabel("x")
+# ax.set_ylabel("y")
+# ax.set_zlabel("z")
+# ax.view_init(0, 0)
+# for node in c.cluster_test:
+#     if node.parent_node:
+#         parent = node.parent_node
+#         ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]])
+#         print(node.coords, node.parent_node.coords, type(node))
 
 # fig.colorbar(im, ax=axs)
 t2 = time.time()
