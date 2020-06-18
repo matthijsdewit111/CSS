@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from mpl_toolkits.mplot3d import Axes3D
+
 
 class Node:
     def __init__(self, coords, creation_time, parent_node):
@@ -38,10 +40,11 @@ class Tree:
     def __init__(self, root_coords, bounds=[[0, 10], [0, 10], [0, 10]]):
         self._root = Node(root_coords, 0, None)
         self._node_list = [self._root]
-        # self._coords_list = [root_coords]
+        self._coords_list = [root_coords]
         self._dimensionality = len(root_coords)
         self._matrix_form = np.zeros(list(bound[1] - bound[0] for bound in bounds), dtype=int)
         self._matrix_form[tuple(root_coords)] = 1
+        self.bounds = bounds
 
     def plot(self):
         if self._dimensionality == 2:
@@ -57,7 +60,7 @@ class Tree:
         # replace with search an stuff to find a parent node instead of given as argument
         new_node = parent.add_child(coords, creation_time)
         self._node_list.append(new_node)
-        # self._coords_list.append(coords)
+        self._coords_list.append(coords)
 
         self._matrix_form[tuple(coords)] = 1
         return new_node
@@ -85,7 +88,20 @@ class Tree:
         plt.show()
 
     def _plot3d(self):
-        raise NotImplementedError
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_xlim(0, self.bounds[0][1])
+        ax.set_ylim(0, self.bounds[1][1])
+        ax.set_zlim(0, self.bounds[2][1])
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
+        ax.view_init(0, 0)
+        for node in self:
+            if node.parent_node:
+                parent = node.parent_node
+                ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c = 'black')
+        plt.show()
 
     def __iter__(self):
         return self._root.__iter__()
