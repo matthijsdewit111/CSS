@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
 from mpl_toolkits.mplot3d import Axes3D
 
 rng = np.random.default_rng()
@@ -71,37 +70,19 @@ class Tree:
         return self._root
 
     def _get_neighbours(self, coords):
-        # calculate coords of all neighbours around a center coord
-        neighbours = np.zeros((2*self._dimensionality, self._dimensionality), dtype=int)
-        for i in range(self._dimensionality):
-            j = i * 2
-            neighbours[j:j+2, i] = [-1, 1]
-            neighbours[j] = neighbours[j] + coords
-            neighbours[j+1] = neighbours[j+1] + coords
+        # calculate coords of all neighbours (Moore neighborhood) around a center coord
+
+        d = self._dimensionality
+        offsets = np.indices((3,) * d) - 1
+        reshaped_offsets = np.stack(offsets, axis=d).reshape(-1, d)
+        offsets_without_middle_point = np.delete(reshaped_offsets, int(d**3 / 2), axis=0)
+        neighbours = offsets_without_middle_point + coords
         neighbours = neighbours.tolist()
 
         # return nodes that are neighbours
         return [node for node in self if node.coords in neighbours]
 
     def _plot2d(self):
-        # N = len(self._matrix_form)
-
-        # # convert all 1s in matrix to nans
-        # matrix_conv = [[0 for i in range(N)] for j in range(N)]
-        # for i in range(N):
-        #     for j in range(N):
-        #         if self._matrix_form[i][j] == 1:
-        #             matrix_conv[i][j] = float('nan')
-
-        # # plot in 2D
-        # fig, axs = plt.subplots(1, 1)
-        # axs.imshow(matrix_conv, cmap='cubehelix')
-        # axs.set_title("2D plot")
-        # axs.set_xlabel("x position [-]")
-        # axs.set_ylabel("y position [-]")
-        # plt.show()
-
-
         fig, ax = plt.subplots(1, 1)
         ax.set_xlim(*self.bounds[0])
         ax.set_ylim(*self.bounds[1])
@@ -113,9 +94,7 @@ class Tree:
             if node.parent_node:
                 parent = node.parent_node
                 ax.plot([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], c='black')
-        
         plt.show()
-
 
     def _plot3d(self):
         fig = plt.figure()
