@@ -58,13 +58,30 @@ class Tree:
     def add(self, coords, creation_time):
         assert len(coords) == self._dimensionality
 
-        parent = rng.choice(self._get_neighbours(coords))
+        nghbrs = self._get_neighbours(coords)
+
+        parent = rng.choice(nghbrs)
         new_node = parent.add_child(coords, creation_time)
         self._node_list.append(new_node)
         self._coords_list.append(coords)
 
         self._matrix_form[tuple(coords)] = 1
         return new_node
+
+    def boundaries(self, coords):
+        i, j, k = coords
+        new_coords = coords
+        if i < 0:
+            new_coords =  [self.bounds[0][1] - 1, new_coords[1], new_coords[2]]
+        if i > self.bounds[0][1] - 1:
+            new_coords =  [0, new_coords[1], new_coords[2]]
+        if k < 0:
+            new_coords =  [new_coords[0], new_coords[1], self.bounds[2][1] - 1]
+        if k > self.bounds[2][1] - 1:
+            new_coords =  [new_coords[0], new_coords[1], 0]
+        
+        return new_coords
+        
 
     def get_root(self):
         return self._root
@@ -78,6 +95,7 @@ class Tree:
         offsets_without_middle_point = np.delete(reshaped_offsets, int(d**3 / 2), axis=0)
         neighbours = offsets_without_middle_point + coords
         neighbours = neighbours.tolist()
+        neighbours = [self.boundaries(neighbour) for neighbour in neighbours]
 
         # return nodes that are neighbours
         return [node for node in self if node.coords in neighbours]
