@@ -12,9 +12,9 @@ from mpl_toolkits.mplot3d import Axes3D
 t1 = time.time()
 
 
-class C():
-    # the diffusion class. Owns a C.c which is the matrix with all the information
-    def __init__(self, seed, eps=10**-7, x = 20, y = 20, z = 20, w=1, eta=1):
+class DLA_diff3d():
+    # the diffusion class. Owns a DLA_diff3d.c which is the matrix with all the information
+    def __init__(self, seed, eps=10**-6, x = 20, y = 20, z = 20, w=1, eta=1):
         self.x = x
         self.y = y
         self.z = z
@@ -29,10 +29,8 @@ class C():
         self.eta = eta
         self.eps = eps
         self.converged = False
-        self.cluster = np.zeros((x, y, z))  # 0 is no cluster 1 is
-        self.cluster[x//2][y - 1][z//2] = 1
-        self.clusters = {tuple([x//2, y-1, z//2])}
-        self.candidates = {tuple([x//2, y-1, z//2])}  # (y, x) from top left
+
+        self.candidates = {}  
 
         self.cluster_test = Tree([x//2, y - 1, z//2], bounds = [[0, x], [0, y], [0, z]])
 
@@ -77,11 +75,24 @@ class C():
         }
         neigh_clust = []
         for neighbour in neighbours:
-            # print("neigh", neighbour, self.cluster_test._coords_list)
             if list(neighbour) in self.cluster_test:
                 neigh_clust.append(neighbour)
 
         return neigh_clust
+
+    def boundaries(self, coords):
+        i, j, k = coords
+        new_coords = coords
+        if i < 0:
+            new_coords =  [self.x - 1, new_coords[1], new_coords[2]]
+        if i > self.x - 1:
+            new_coords =  [0, new_coords[1], new_coords[2]]
+        if k < 0:
+            new_coords =  [new_coords[0], new_coords[1], self.z - 1]
+        if k > self.z - 1:
+            new_coords =  [new_coords[0], new_coords[1], 0]
+        
+        return new_coords
 
     def update(self):
         # update the matrix
@@ -89,7 +100,7 @@ class C():
         for j in range(1, self.y - 1):
             for i in range(self.x):
                 for k in range(self.z):
-                    if self.cluster[i][j][k] == 0:
+                    if [i, j, k] not in self.cluster_test:
 
                         # save values to compute the change in value for one iteration
                         original_val = self.c[i][j][k]
@@ -112,23 +123,24 @@ class C():
     # compute the growth candidates
     def growth_candidates(self):
         # create a set for all possible growth candidates
+        final_neighbours = set()
 
-        g_candidates = set()
-        self.candidates = self.clusters
-        for i, j, k in self.candidates:
-            if (j - 1 >= 0):
-                g_candidates.add(tuple([i, j - 1, k]))
-            if (j + 1 <= (self.y - 1)):
-                g_candidates.add(tuple([i, j + 1, k]))
-            if (i - 1 >= 0):
-                g_candidates.add(tuple([i - 1, j, k]))
-            if (i + 1 <= (self.x - 1)):
-                g_candidates.add(tuple([i + 1, j, k]))
-            if (k - 1 >= 0):
-                g_candidates.add(tuple([i, j, k - 1]))
-            if (k + 1 <= (self.z - 1)):
-                g_candidates.add(tuple([i, j, k + 1]))
-        self.candidates = self.candidates | g_candidates  
+        for node in self.cluster_test:
+
+            coords = node.coords
+            d = 3
+            offsets = np.indices((3,) * d) - 1
+            reshaped_offsets = np.stack(offsets, axis=d).reshape(-1, d)
+            offsets_without_middle_point = np.delete(reshaped_offsets, int(d**3 / 2), axis=0)
+            neighbours = offsets_without_middle_point + coords
+            neighbours = neighbours.tolist()
+            
+            for neighbour in neighbours:
+                if neighbour not in self.cluster_test:
+                    if 0 < neighbour[1] < self.y - 1:
+                        final_neighbours.add(tuple(self.boundaries(neighbour)))
+
+        self.candidates = final_neighbours
 
 
 
@@ -149,81 +161,66 @@ class C():
         for i, j, k in self.candidates:
             combined_c += (self.c[i][j][k] ** self.eta)
             if (combined_c / c_sum) > rndm:
-                self.clusters.add(tuple([i, j, k]))
-                self.cluster[i][j][k] = 1
 
-                # retrieve the parent node
-                parent_coords = random.choice(self.neighbouring_cluster(i, j, k))
-                for x in range(len(self.cluster_test._coords_list)):
-                    if self.cluster_test._coords_list[x] == list(parent_coords):
+                self.cluster_test.add([i, j, k], creation_time)
 
-                        addednode = self.cluster_test.add([i, j, k], creation_time, self.cluster_test._node_list[x])
                 break
         self.converged = False
 
 # parameter that controls the shape of the cluster. Higher -> more stretched out
-eta = 3
-x, y, z = [30, 50, 30]
+eta = 2
+x, y, z = [20, 60, 20]
 
 
-c = C(seed=[x//2, x - 1], x = x, y = y, z = z, eta=eta, w = 1)
-while c.converged == False:
-    c.update()
+dla_diffusion = DLA_diff3d(seed=[x//2, x - 1], x = x, y = y, z = z, eta=eta, w = 1)
+while dla_diffusion.converged == False:
+    dla_diffusion.update()
 
-for i in range(30):
-    if i % 10 == 0:
-        print(i)
-    c.growth(i + 1)
+for t in range(140):
+    if t % 10 == 0:
+        print(t)
+    dla_diffusion.growth(t + 1)
 
-    while (c.converged == False):
-        c.update()
-
-
-fig, ax = plt.subplots(1, 1)
-
-side = np.zeros((y, z))
-for i in range(x):
-    for j in range(y):
-        for k in range(z):
-            if c.cluster[i][j][k] == 1:
-                print(1 - (abs(i - x//2)/x), i, x//2)
-                side[j][k] += 1 * (1 - (abs(i - x//2)) / x)
-ax.imshow(side)
+    while (dla_diffusion.converged == False):
+        dla_diffusion.update()
 
 
-c.cluster_test.plot()
+# fig, ax = plt.subplots(1, 1)
 
-# plot slices
+# side = np.zeros((y, z))
 # for i in range(x):
 #     for j in range(y):
 #         for k in range(z):
-#             if c.cluster[i][j][k] == 1:
-#                 c.c[i][j][k] = float('nan')
+#             if dla_diffusion.cluster[i][j][k] == 1:
+#                 print(1 - (abs(i - x//2)/x), i, x//2)
+#                 side[j][k] += 1 * (1 - (abs(i - x//2)) / x)
+# ax.imshow(side)
 
-# fig, ax = plt.subplots(2, 2)
-# axs = ax.flatten()
-# axs[0].imshow(c.c[x//2])
-# axs[1].imshow(c.c[x//2 + 1])
-# axs[2].imshow(c.c[x//2 + 2])
-# axs[3].imshow(c.c[x//2 - 1])
-# plt.show()
-# 3d plot
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.set_xlim(0, x)
-# ax.set_ylim(0, y)
-# ax.set_zlim(0, z)
-# ax.set_xlabel("x")
-# ax.set_ylabel("y")
-# ax.set_zlabel("z")
-# ax.view_init(0, 0)
-# for node in c.cluster_test:
-#     if node.parent_node:
-#         parent = node.parent_node
-#         ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]])
-#         print(node.coords, node.parent_node.coords, type(node))
+# plot slices
 
-# fig.colorbar(im, ax=axs)
 t2 = time.time()
 print(t2-t1, "TIME")
+
+dla_diffusion.cluster_test.plot()
+
+# for i in range(x):
+#     for j in range(y):
+#         for k in range(z):
+#             if dla_diffusion.cluster[i][j][k] == 1:
+#                 dla_diffusion.c[i][j][k] = float('nan')
+
+# fig, ax = plt.subplots(3, 2, figsize = (8, 8), constrained_layout = True)
+# axs = ax.flatten()
+# axs[0].imshow(dla_diffusion.c[x//2])
+# axs[1].imshow(dla_diffusion.c[x//2 + 1])
+# axs[2].imshow(dla_diffusion.c[x//2 + 2])
+# axs[3].imshow(dla_diffusion.c[x//2 + 3])
+# axs[4].imshow(dla_diffusion.c[x//2 - 1])
+# axs[5].imshow(dla_diffusion.c[x//2 - 2])
+
+
+
+
+
+
 plt.show()
