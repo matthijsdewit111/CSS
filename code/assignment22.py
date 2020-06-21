@@ -105,7 +105,7 @@ class C():
                         walker_p = [walker_p[0], walker_p[1] - 1]
                     else:
                         check_stick = False
-                        
+
             if check_stick == True:
                 for i, j in self.candidates:
                     if i == walker_p[0] and j == walker_p[1]:
@@ -129,7 +129,7 @@ fig, axs = plt.subplots(1, 1)
 c = C(seed = [N//2, N - 1], N = N)
 
 # number of points
-for i in range(250):
+for i in range(25):
     while (c.walking == True):
         c.walker(p_stick)
     c.walking = True

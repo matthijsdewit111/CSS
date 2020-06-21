@@ -1,0 +1,18 @@
+.title-index {
+  /* background-size: cover; */
+  background-image: url("static/img/background2.PNG");
+}
+
+.title {
+  /* background-size: cover; */
+  background-image: url("../static/img/background2.PNG");
+}
+
+
+#title {
+  color: white;
+}
+
+.jumbotron {
+    border-radius: 0 !important;
+}

@@ -9,8 +9,10 @@ import random
 import pickle
 from tqdm import tqdm
 from mpl_toolkits.mplot3d import Axes3D
+from neuronal_tree import Tree
 
 t1 = time.time()
+
 
 class C():
     # the diffusion class. Owns a C.c which is the matrix with all the information
@@ -23,6 +25,24 @@ class C():
         self.clusters = {tuple([seed[2], seed[1], seed[0]])}
         self.candidates = {tuple([seed[2], seed[1], seed[0]])} # (y, x) from top left
         self.walking = True
+        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]])
+
+    def neighbouring_cluster(self, x, y, z):
+        neighbours = {
+        (x + 1, y, z),
+        (x - 1, y, z),
+        (x, y + 1, z),
+        (x, y - 1, z),
+        (x, y, z + 1),
+        (x, y, z - 1)
+        }
+        neigh_clust = []
+        for neighbour in neighbours:
+            # print("neigh", neighbour, self.cluster_test._coords_list)
+            if list(neighbour) in self.tree:
+                neigh_clust.append(neighbour)
+
+        return neigh_clust
 
     # compute the growth candidates
     def growth_candidates(self):
@@ -52,7 +72,7 @@ class C():
             return True
 
     # walk untill stuck to a candidate
-    def walker(self, p_stick):
+    def walker(self, p_stick, creation_time):
 
         # create walker
         rndm1 = random.randrange(self.N)
@@ -77,29 +97,29 @@ class C():
                         check_stick = False
                 else:
                     rndm = random.randrange(self.N)
-                    walker_p= [0, rndm, walker_p[2]] # walker 2 of 0?
+                    walker_p = [0, rndm, walker_p[2]] # walker 2 of 0?
 
             # take step in direction RIGHT
             elif rndm_direc == 1:
                 if (walker_p[1] + 1) > (self.N - 1):
                     if self.check_move(tuple([walker_p[0], walker_p[0], walker_p[2]])):
-                        walker_p= [walker_p[0], 0, walker_p[2]]
+                        walker_p = [walker_p[0], 0, walker_p[2]]
                     else:
                         check_stick = False
                 else:
                     if self.check_move(tuple([walker_p[0], walker_p[1] + 1, walker_p[2]])):
-                        walker_p= [walker_p[0], walker_p[1] + 1, walker_p[2]]
+                        walker_p = [walker_p[0], walker_p[1] + 1, walker_p[2]]
 
             # take step in direction DOWN
             elif rndm_direc == 2:
                 if walker_p[0] + 1 <= (self.N - 1):
                     if self.check_move(tuple([walker_p[0] + 1, walker_p[1], walker_p[2]])):
-                        walker_p= [walker_p[0] + 1, walker_p[1], walker_p[2]]
+                        walker_p = [walker_p[0] + 1, walker_p[1], walker_p[2]]
                     else:
                         check_stick = False
                 else:
                     rndm = random.randrange(self.N)
-                    walker_p= [rndm, 0, rndm]
+                    walker_p = [rndm, 0, rndm]
 
             # take step in direction LEFT
             elif rndm_direc == 3:
@@ -123,7 +143,7 @@ class C():
                         check_stick = False
                 else:
                     rndm = random.randrange(self.N)
-                    walker_p= [0, rndm, walker_p[2]]
+                    walker_p = [0, rndm, walker_p[2]]
 
             # take step in direction BACK
             elif rndm_direc == 4:
@@ -143,6 +163,9 @@ class C():
                         if x > p_stick:
                             self.clusters.add(tuple([i, j, k]))
                             self.cluster[i][j][k] = 1
+
+                            self.tree.add([i, j, k], creation_time)
+
                             no_match = False
                             self.walking = False
                             break
@@ -150,19 +173,19 @@ class C():
             check_stick = True
 
 
-N = 70
+N = 50
 
 # controls the chance of the random walker sticking to the cluster
 # higher means lower chance
 p_stick = 0.5
 # fig, axs = plt.subplots(1, 1)
 
-c = C(seed = [N//2, N//2, N - 1], N = N)
+c = C(seed = [N//2, N // 2, N//2], N = N)
 
 # number of points
 for i in tqdm(range(250)):
     while (c.walking == True):
-        c.walker(p_stick)
+        c.walker(p_stick, i + 1)
     c.walking = True
 
 # cluster
@@ -171,6 +194,8 @@ for i in range(N):
         for k in range(N):
             if c.cluster[i][j][k] == 1:
                 c.c[i][j][k] = float('nan')
+
+c.tree._plot3d()
 
 ## 3D plotting
 fig = plt.figure()

@@ -109,7 +109,7 @@ while (c.converged == False):
     c.update()
 
 # number of cluster points
-for i in range(250):
+for i in range(25):
     if i % 10 == 0:
         print(i)
     c.growth()
