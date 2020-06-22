@@ -1,5 +1,5 @@
 .title {
-  /* background-size: cover; */
+  background-size: cover;
   background-image: url("https://github.com/matthijsdewit111/CSS/blob/master/static/img/background2.png?raw=true");
 }
 
@@ -7,9 +7,14 @@
   color: white;
 }
 
+.serif {
+  font-family: "Georgia", Georgia, serif;
+  /* font-weight: bold; */
+}
+
 .white {
   color: white !important;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 .grey {
