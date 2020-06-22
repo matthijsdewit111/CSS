@@ -4,6 +4,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import random
 rng = np.random.default_rng()
 
+"""
+Currently not fully working or implemented
+
+Tree._matrix_form
+Node.depth (I think haven't investigated how pruning affected this)
+"""
 
 class Node:
     def __init__(self, coords, creation_time, parent_node):
@@ -48,7 +54,6 @@ class Tree:
         self._matrix_form[tuple(root_coords)] = 1
         self.bounds = bounds
         self.system_time = 0
-        self.remove_nodes = []
 
     def plot(self):
         if self._dimensionality == 2:
@@ -59,39 +64,42 @@ class Tree:
             raise NotImplementedError
 
     def prune(self, p, PS):
+        # remove the nodes, created between 5 and PS timesteps ago
+        # with a probability p
+
         leafs = []
 
+        # leafs that meet the requirements
         for i in range(1, len(self._node_list)):
             if self._node_list[i].is_leaf:
                 if self.system_time - 5 > self._node_list[i].creation_time > self.system_time - PS:
                     leafs.append([self._node_list[i], i])
 
+        # invert the list to remove from the back of the lists
         leafs = leafs[::-1] 
-        node_types = [[node.is_leaf, node] for node in self._node_list] 
 
-        all_leafs = []
-
-        for node in self._node_list:
-            if node.is_leaf == True:
-                all_leafs.append([node, node.creation_time])
-
+        # remove the nodes with chance p
         for node, index in leafs:
             rndm = random.random()
             if rndm < p:
                 print("node will be removed:", node)
                 parent = self._node_list[index].parent_node
 
+                # make parent leaf when its only child is removed
                 if len(parent.child_nodes) == 1:
                     parent.is_leaf = True
 
-                removed1 = self._node_list.pop(index)
-                removed2 = self._coords_list.pop(index)
+                # remove the node
+                self._node_list.pop(index)
+                self._coords_list.pop(index)
 
 
     def add(self, coords, creation_time):
+        # adds a new node and prunes
+
         assert len(coords) == self._dimensionality
         
-
+        # assign a random parent in range to the new node
         parent = rng.choice(self._get_neighbours(coords))
         new_node = parent.add_child(coords, creation_time)
 
@@ -125,7 +133,6 @@ class Tree:
 
     def _get_neighbours(self, coords):
         # calculate coords of all neighbours (Moore neighborhood) around a center coord
-
         d = self._dimensionality
         offsets = np.indices((3,) * d) - 1
         reshaped_offsets = np.stack(offsets, axis=d).reshape(-1, d)
@@ -162,22 +169,21 @@ class Tree:
         ax.set_zlabel("z")
         ax.view_init(0, 0)
 
-        length = 0
-        for x in self:
-            length += 1
-
         for node in self._node_list:
             if node.parent_node:
                 parent = node.parent_node
                 ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='black')
-        leafs = []
-        for node in self._node_list:
-            if node.is_leaf:
-                leafs.append(node)
-        for node in leafs:
-            if node.parent_node:
-                parent = node.parent_node
-                ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='red', alpha = 0.4)
+        
+        # For plotting the leafs, not neccessary just keeping it here for now
+
+        # leafs = []
+        # for node in self._node_list:
+        #     if node.is_leaf:
+        #         leafs.append(node)
+        # for node in leafs:
+        #     if node.parent_node:
+        #         parent = node.parent_node
+        #         ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='red', alpha = 0.4)
 
         plt.show()
 
