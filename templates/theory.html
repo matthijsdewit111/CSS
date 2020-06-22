@@ -8,7 +8,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="static/css/style.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/style.css">
   <style>
   .fakeimg {
     height: 200px;
@@ -19,18 +19,18 @@
 <body>
 
 <div class="jumbotron title text-center" style="margin-bottom:0">
-  <h2>Simulating neuronal dendrites with diffusion-limited aggregation</h2>
+  <h2 id="title">Simulating neuronal dendrites with diffusion-limited aggregation</h2>
 </div>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <a class="navbar-brand" href="../index.html">Overview</a>
+  <a class="navbar-brand grey" href="../index.html">Overview</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="#">Theory</a>
+        <a class="nav-link white" href="#">Theory</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="model.html">Model</a>
@@ -105,13 +105,31 @@
   </div>
   <div class="col-md-3">
     <br>
-    <img src="../../img/luczak.PNG" alt="dla" width="300px" height="200px"></img>
+    <img src="https://github.com/matthijsdewit111/CSS/blob/master/static/img/luczak.PNG?raw=true" alt="dla" width="300px" height="200px"></img>
     <br>
   </div>
   <div class="col-md-2"></div>
 </div>
 
-<hr color=black;>
+<hr style="width:70%;">
+
+<div class="row text-center">
+
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <br>
+    <h3>Research question & hypothesis</h3>
+    <ul>
+      <a>&rarr;  Can dendrites be modelled using DLA?</a><br>
+      <a>&rarr;  How does pruning affect dendritic spines in the computational model?</a><br>
+      <a>&rarr;  Is the DLA model biologically relevant?</a><br>
+    </ul>
+  </div>
+  <div class="col-md-2"></div>
+</div>
+
+<hr style="color=black;size=3;color: #333;background-color:#333;">
+
 <!-- Footer -->
 <footer class="center page-footer font-small mdb-color lighten-3 pt-4">
 
@@ -160,7 +178,6 @@
 
       <!-- <hr class="clearfix w-100 d-md-none"> -->
 
-
       <!-- Grid column -->
 
     </div>
@@ -168,8 +185,6 @@
 
   </div>
   <!-- Footer Links -->
-
-
 
 </footer>
 <!-- Footer -->
