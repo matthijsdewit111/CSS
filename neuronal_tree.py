@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
-
+import random
 rng = np.random.default_rng()
 
 
@@ -12,6 +12,7 @@ class Node:
         self.parent_node = parent_node
         self.child_nodes = []
         self.is_leaf = True
+        
 
         if parent_node is None:
             self.depth = 0
@@ -46,6 +47,8 @@ class Tree:
         self._matrix_form = np.zeros(list(bound[1] - bound[0] for bound in bounds), dtype=int)
         self._matrix_form[tuple(root_coords)] = 1
         self.bounds = bounds
+        self.system_time = 0
+        self.remove_nodes = []
 
     def plot(self):
         if self._dimensionality == 2:
@@ -55,17 +58,51 @@ class Tree:
         else:
             raise NotImplementedError
 
+    def prune(self, p, PS):
+        leafs = []
+
+        for i in range(1, len(self._node_list)):
+            if self._node_list[i].is_leaf:
+                if self.system_time - 5 > self._node_list[i].creation_time > self.system_time - PS:
+                    leafs.append([self._node_list[i], i])
+
+        leafs = leafs[::-1] 
+        node_types = [[node.is_leaf, node] for node in self._node_list] 
+
+        all_leafs = []
+
+        for node in self._node_list:
+            if node.is_leaf == True:
+                all_leafs.append([node, node.creation_time])
+
+        for node, index in leafs:
+            rndm = random.random()
+            if rndm < p:
+                print("node will be removed:", node)
+                parent = self._node_list[index].parent_node
+
+                if len(parent.child_nodes) == 1:
+                    parent.is_leaf = True
+
+                removed1 = self._node_list.pop(index)
+                removed2 = self._coords_list.pop(index)
+
+
     def add(self, coords, creation_time):
         assert len(coords) == self._dimensionality
+        
 
-        nghbrs = self._get_neighbours(coords)
-
-        parent = rng.choice(nghbrs)
+        parent = rng.choice(self._get_neighbours(coords))
         new_node = parent.add_child(coords, creation_time)
+
+        self.system_time = creation_time
+
         self._node_list.append(new_node)
         self._coords_list.append(coords)
+        self._matrix_form[tuple(coords)] = 1    
 
-        self._matrix_form[tuple(coords)] = 1
+        self.prune(0.4, 40)
+
         return new_node
 
     def boundaries(self, coords):
@@ -98,7 +135,7 @@ class Tree:
         neighbours = [self.boundaries(neighbour) for neighbour in neighbours]
 
         # return nodes that are neighbours
-        return [node for node in self if node.coords in neighbours]
+        return [node for node in self._node_list if node.coords in neighbours]
 
     def _plot2d(self):
         fig, ax = plt.subplots(1, 1)
@@ -124,10 +161,24 @@ class Tree:
         ax.set_ylabel("y")
         ax.set_zlabel("z")
         ax.view_init(0, 0)
-        for node in self:
+
+        length = 0
+        for x in self:
+            length += 1
+
+        for node in self._node_list:
             if node.parent_node:
                 parent = node.parent_node
                 ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='black')
+        leafs = []
+        for node in self._node_list:
+            if node.is_leaf:
+                leafs.append(node)
+        for node in leafs:
+            if node.parent_node:
+                parent = node.parent_node
+                ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='red', alpha = 0.4)
+
         plt.show()
 
     def __iter__(self):

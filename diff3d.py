@@ -14,7 +14,7 @@ t1 = time.time()
 
 class DLA_diff3d():
     # the diffusion class. Owns a DLA_diff3d.c which is the matrix with all the information
-    def __init__(self, seed, eps=10**-6, x = 20, y = 20, z = 20, w=1, eta=1):
+    def __init__(self, seed, eps=10**-5, x = 20, y = 20, z = 20, w=1, eta=1):
         self.x = x
         self.y = y
         self.z = z
@@ -125,7 +125,7 @@ class DLA_diff3d():
         # create a set for all possible growth candidates
         final_neighbours = set()
 
-        for node in self.cluster_test:
+        for node in self.cluster_test._node_list:
 
             coords = node.coords
             d = 3
@@ -136,7 +136,7 @@ class DLA_diff3d():
             neighbours = neighbours.tolist()
             
             for neighbour in neighbours:
-                if neighbour not in self.cluster_test:
+                if neighbour not in self.cluster_test._node_list:
                     if 0 < neighbour[1] < self.y - 1:
                         final_neighbours.add(tuple(self.boundaries(neighbour)))
 
@@ -168,15 +168,15 @@ class DLA_diff3d():
         self.converged = False
 
 # parameter that controls the shape of the cluster. Higher -> more stretched out
-eta = 2
-x, y, z = [20, 60, 20]
+eta = 4
+x, y, z = [40, 60, 40]
 
 
 dla_diffusion = DLA_diff3d(seed=[x//2, x - 1], x = x, y = y, z = z, eta=eta, w = 1)
 while dla_diffusion.converged == False:
     dla_diffusion.update()
 
-for t in range(140):
+for t in range(150):
     if t % 10 == 0:
         print(t)
     dla_diffusion.growth(t + 1)
