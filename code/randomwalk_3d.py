@@ -44,25 +44,42 @@ class C():
 
         return neigh_clust
 
+
+    def boundaries(self, coords):
+        i, j, k = coords
+        new_coords = coords
+        if i < 0:
+            new_coords =  [self.N - 1, new_coords[1], new_coords[2]]
+        if i > self.N - 1:
+            new_coords =  [0, new_coords[1], new_coords[2]]
+        if k < 0:
+            new_coords =  [new_coords[0], new_coords[1], self.N - 1]
+        if k > self.N - 1:
+            new_coords =  [new_coords[0], new_coords[1], 0]
+        
+        return new_coords
+
     # compute the growth candidates
     def growth_candidates(self):
-        g_candidates = set()
-        self.candidates = self.clusters
-        for i, j, k in self.candidates:
-            if (j - 1 >= 0):
-                g_candidates.add(tuple([i, j - 1, k]))
-            if (j + 1 <= (self.N - 1)):
-                g_candidates.add(tuple([i, j + 1, k]))
-            if (i - 1 >= 0):
-                g_candidates.add(tuple([i - 1, j, k]))
-            if (i + 1 <= (self.N - 1)):
-                g_candidates.add(tuple([i + 1, j, k]))
-            if (k - 1 >= 0):
-                g_candidates.add(tuple([i, j, k - 1]))
-            if (k + 1 <= (self.N - 1)):
-                g_candidates.add(tuple([i, j, k + 1]))
+        # create a set for all possible growth candidates
+        final_neighbours = set()
 
-        self.candidates = self.candidates | g_candidates
+        for node in self.tree._node_list:
+
+            coords = node.coords
+            d = 3
+            offsets = np.indices((3,) * d) - 1
+            reshaped_offsets = np.stack(offsets, axis=d).reshape(-1, d)
+            offsets_without_middle_point = np.delete(reshaped_offsets, int(d**3 / 2), axis=0)
+            neighbours = offsets_without_middle_point + coords
+            neighbours = neighbours.tolist()
+            
+            for neighbour in neighbours:
+                if neighbour not in self.tree._node_list:
+                    if 0 < neighbour[1] < self.N - 1:
+                        final_neighbours.add(tuple(self.boundaries(neighbour)))
+
+        self.candidates = final_neighbours
 
     # check if the move doesn't go in the cluster
     def check_move(self, set):
@@ -183,7 +200,7 @@ p_stick = 0.5
 c = C(seed = [N//2, N // 2, N//2], N = N)
 
 # number of points
-for i in tqdm(range(250)):
+for i in tqdm(range(200)):
     while (c.walking == True):
         c.walker(p_stick, i + 1)
     c.walking = True
