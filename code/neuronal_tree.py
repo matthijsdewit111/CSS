@@ -29,6 +29,11 @@ class Node:
         self.child_nodes.append(new_node)
         self.is_leaf = False
         return new_node
+    
+    def remove_child(self, node):
+        self.child_nodes.remove(node)
+        if len(self.child_nodes) == 0:
+            self.is_leaf = True
 
     def __iter__(self):
         yield self
@@ -67,30 +72,23 @@ class Tree:
         # with a probability p
 
         leafs = []
-
         # leafs that meet the requirements
-        for i in range(1, len(self._node_list)):
-            if self._node_list[i].is_leaf:
-                if self.system_time - 5 > self._node_list[i].creation_time > self.system_time - PS:
-                    leafs.append([self._node_list[i], i])
-
-        # invert the list to remove from the back of the lists
-        leafs = leafs[::-1]
+        for node in self._node_list:
+            if node.is_leaf:
+                if self.system_time - 5 > node.creation_time > self.system_time - PS:
+                    leafs.append(node)
 
         # remove the nodes with chance p
-        for node, index in leafs:
+        for node in leafs:
             rndm = random.random()
             if rndm < p:
                 print("node will be removed:", node)
-                parent = self._node_list[index].parent_node
-
-                # make parent leaf when its only child is removed
-                if len(parent.child_nodes) == 1:
-                    parent.is_leaf = True
+                parent = node.parent_node
 
                 # remove the node
-                self._node_list.pop(index)
-                self._coords_list.pop(index)
+                parent.remove_child(node)
+                self._node_list.remove(node)
+                self._coords_list.remove(node.coords)
 
     def add(self, coords, creation_time):
         # adds a new node and prunes
