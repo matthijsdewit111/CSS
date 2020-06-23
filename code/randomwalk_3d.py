@@ -160,7 +160,8 @@ c.tree._plot3d()
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-for list_of_point in c.tree:
+for node in c.tree:
+    list_of_point = node.coords
     ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
 
 ax.axes.set_xlim3d(left=0, right=N)
