@@ -8,7 +8,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import random
 import pickle
 from tqdm import tqdm
-from mpl_toolkits.mplot3d import Axes3D
+
 from neuronal_tree import Tree
 
 t1 = time.time()
@@ -18,14 +18,14 @@ class C():
     # the diffusion class. Owns a C.c which is the matrix with all the information
     def __init__(self, seed, N):
         self.N = N
-        self.dx = 1/N
+        self.dx = 1 / N
         self.c = [[[0 for i in range(N)] for j in range(N)] for k in range(N)]
         self.cluster = [[[0 for i in range(N)] for j in range(N)] for k in range(N)] # 0 is no cluster 1 is
-        self.cluster[seed[2]][seed[1]][seed[0]] = 1
-        self.clusters = {tuple([seed[2], seed[1], seed[0]])}
-        self.candidates = {tuple([seed[2], seed[1], seed[0]])} # (y, x) from top left
+        self.cluster[seed[0]][seed[1]]] = 1
+        self.clusters = {tuple([seed[0], seed[1]])}
+        self.candidates = {tuple([seed[0], seed[1]])} # (y, x) from top left
         self.walking = True
-        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]])
+        self.tree = Tree(seed, bounds=[[0, N], [0, N]]])
 
     def neighbouring_cluster(self, x, y, z):
         neighbours = {
@@ -100,9 +100,7 @@ class C():
         walker_p = []
         for w in range(1):
             rndm1 = random.randrange(self.N)
-            rndm2 = random.randrange(self.N)
-            rndm3 = random.randrange(self.N)
-            walker = [rndm2, 0, rndm1]
+            walker = [rndm1, 0]
             walker_p.append(walker)
         #
         # # create walker
@@ -125,78 +123,59 @@ class C():
                 # take step in direction UP
                 if rndm_direc == 0:
                     if walker_p[w][0] - 1 >= 0:
-                        if self.check_move(tuple([walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]])):
-                            walker_p[w] = [walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]]
+                        if self.check_move(tuple([walker_p[w][0] - 1, walker_p[w][1]])):
+                            walker_p[w] = [walker_p[w][0] - 1, walker_p[w][1]]
                         else:
                             check_stick = False
                     else:
                         rndm = random.randrange(self.N)
-                        walker_p[w] = [0, rndm, walker_p[w][2]] # walker 2 of 0?
+                        walker_p[w] = [0, rndm] # walker 2 of 0?
 
                 # take step in direction RIGHT
                 elif rndm_direc == 1:
                     if (walker_p[w][1] + 1) > (self.N - 1):
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][0], walker_p[w][2]])):
-                            walker_p[w] = [walker_p[w][0], 0, walker_p[w][2]]
+                        if self.check_move(tuple([walker_p[w][0], walker_p[w][0]])):
+                            walker_p[w] = [walker_p[w][0], 0]
                         else:
                             check_stick = False
                     else:
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]])):
-                            walker_p[w] = [walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]]
+                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1] + 1])):
+                            walker_p[w] = [walker_p[w][0], walker_p[w][1] + 1]
 
                 # take step in direction DOWN
                 elif rndm_direc == 2:
                     if walker_p[w][0] + 1 <= (self.N - 1):
-                        if self.check_move(tuple([walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]])):
-                            walker_p[w] = [walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]]
+                        if self.check_move(tuple([walker_p[w][0] + 1, walker_p[w][1]])):
+                            walker_p[w] = [walker_p[w][0] + 1, walker_p[w][1]]
                         else:
                             check_stick = False
                     else:
                         rndm = random.randrange(self.N)
-                        walker_p[w] = [rndm, 0, rndm]
+                        walker_p[w] = [rndm, 0]
 
                 # take step in direction LEFT
                 elif rndm_direc == 3:
                     if (walker_p[w][1] - 1) < 0:
-                        if self.check_move(tuple([walker_p[w][0], self.N - 1, walker_p[w][2]])):
-                            walker_p[w] = [walker_p[w][0], self.N - 1, walker_p[w][2]]
+                        if self.check_move(tuple([walker_p[w][0], self.N - 1])):
+                            walker_p[w] = [walker_p[w][0], self.N - 1]
                         else:
                             check_stick = False
                     else:
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]])):
-                            walker_p[w] = [walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]]
+                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1] - 1])):
+                            walker_p[w] = [walker_p[w][0], walker_p[w][1] - 1]
                         else:
                             check_stick = False
 
-                # take step in direction BACK (Z DOWN)
-                elif rndm_direc == 5:
-                    if walker_p[w][2] - 1 >= 0:
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1])):
-                            walker_p[w] = [walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1]
-                        else:
-                            check_stick = False
-                    else:
-                        walker_p[w] = [walker_p[w][0], walker_p[w][1], self.N - 1]
-
-                # take step in direction FRONT (Z UP)
-                elif rndm_direc == 4:
-                    if (walker_p[w][2] + 1) > (self.N - 1):
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1], walker_p[w][2] + 1])):
-                            walker_p[w] = [walker_p[w][0], 0, walker_p[w][2]]
-                        else:
-                            check_stick = False
-                    else:
-                        walker_p[w] = [walker_p[w][0], walker_p[w][1], 0]
 
                 if check_stick == True:
-                    for i, j, k in self.candidates:
-                        if i == walker_p[w][0] and j == walker_p[w][1] and k == walker_p[w][2]:
+                    for i, j in self.candidates:
+                        if i == walker_p[w][0] and j == walker_p[w][1]:
                             x = random.random()
                             if x > p_stick:
-                                self.clusters.add(tuple([i, j, k]))
-                                self.cluster[i][j][k] = 1
+                                self.clusters.add(tuple([i, j]))
+                                self.cluster[i][j] = 1
 
-                                self.tree.add([i, j, k], creation_time)
+                                self.tree.add([i, j], creation_time)
 
                                 no_match = False
                                 self.walking = False
@@ -212,7 +191,7 @@ N = 50
 p_stick = 0
 # fig, axs = plt.subplots(1, 1)
 
-c = C(seed = [N//2, N - 1, N//2], N = N)
+c = C(seed = [N//2, N - 1], N = N)
 
 # number of points
 for i in tqdm(range(600)):
@@ -224,8 +203,8 @@ for i in tqdm(range(600)):
 for i in range(N):
     for j in range(N):
         for k in range(N):
-            if c.cluster[i][j][k] == 1:
-                c.c[i][j][k] = float('nan')
+            if c.cluster[i][j] == 1:
+                c.c[i][j] = float('nan')
 
 c.tree._plot3d()
 
@@ -234,7 +213,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 for list_of_point in c.clusters:
-    ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
+    ax.scatter(list_of_point[0], list_of_point[1])
 
 ax.axes.set_xlim3d(left=0, right=N)
 ax.axes.set_ylim3d(bottom=0, top=N)
