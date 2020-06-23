@@ -1,14 +1,10 @@
-import numpy as np
-from copy import deepcopy
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import time
-from matplotlib import cm
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import random
-import pickle
+import time
+
+import matplotlib.pyplot as plt
+import numpy as np
 from tqdm import tqdm
-from mpl_toolkits.mplot3d import Axes3D
+
 from neuronal_tree import Tree
 
 t1 = time.time()
