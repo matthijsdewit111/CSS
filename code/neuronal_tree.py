@@ -10,6 +10,7 @@ Tree._matrix_form
 Node.depth (I think haven't investigated how pruning affected this)
 """
 
+
 class Node:
     def __init__(self, coords, creation_time, parent_node):
         self.coords = coords
@@ -17,7 +18,6 @@ class Node:
         self.parent_node = parent_node
         self.child_nodes = []
         self.is_leaf = True
-
 
         if parent_node is None:
             self.depth = 0
@@ -93,7 +93,6 @@ class Tree:
                 self._coords_list.pop(index)
 
 
-    def add(self, coords, creation_time):
         # adds a new node and prunes
 
         assert len(coords) == self._dimensionality
@@ -113,8 +112,7 @@ class Tree:
         return new_node
 
     def boundaries(self, coords):
-        peridoic_directions = [0, 2] # X and Z, Y not
-
+        peridoic_directions = [0, 2]  # X and Z, Y not
         new_coords = coords
         for i, coord in enumerate(coords):
             if i not in peridoic_directions:
@@ -126,7 +124,6 @@ class Tree:
                 new_coords[i] = self.bounds[i][0]
 
         return new_coords
-
 
     def get_root(self):
         return self._root
@@ -190,7 +187,7 @@ class Tree:
 
                 if zp == self.bounds[2][0] and zc == self.bounds[2][1] - 1:
                     zp = self.bounds[2][1]
-                if zp == self.bounds[2][1] - 1 and zc == self.bounds[2][0]:
+                elif zp == self.bounds[2][1] - 1 and zc == self.bounds[2][0]:
                     zp = self.bounds[2][0] - 1
 
                 ax.plot3D([xp, xc], [yp, yc], [zp, zc], c='black')
