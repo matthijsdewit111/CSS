@@ -20,75 +20,12 @@ class C():
         self.N = N
         self.dx = 1/N
         self.c = [[[0 for i in range(N)] for j in range(N)] for k in range(N)]
-        self.cluster = [[[0 for i in range(N)] for j in range(N)] for k in range(N)] # 0 is no cluster 1 is
-        self.cluster[seed[2]][seed[1]][seed[0]] = 1
-        self.clusters = {tuple([seed[2], seed[1], seed[0]])}
-        self.candidates = {tuple([seed[2], seed[1], seed[0]])} # (y, x) from top left
         self.walking = True
         self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]])
 
-    def neighbouring_cluster(self, x, y, z):
-        neighbours = {
-        (x + 1, y, z),
-        (x - 1, y, z),
-        (x, y + 1, z),
-        (x, y - 1, z),
-        (x, y, z + 1),
-        (x, y, z - 1)
-        }
-        neigh_clust = []
-        for neighbour in neighbours:
-            # print("neigh", neighbour, self.cluster_test._coords_list)
-            if list(neighbour) in self.tree:
-                neigh_clust.append(neighbour)
-
-        return neigh_clust
-
-
-    def boundaries(self, coords):
-        i, j, k = coords
-        new_coords = coords
-        if i < 0:
-            new_coords =  [self.N - 1, new_coords[1], new_coords[2]]
-        if i > self.N - 1:
-            new_coords =  [0, new_coords[1], new_coords[2]]
-        if k < 0:
-            new_coords =  [new_coords[0], new_coords[1], self.N - 1]
-        if k > self.N - 1:
-            new_coords =  [new_coords[0], new_coords[1], 0]
-
-        return new_coords
-
-    # compute the growth candidates
-    def growth_candidates(self):
-        # create a set for all possible growth candidates
-        # final_neighbours = set()
-        #
-        # for node in self.tree._node_list:
-        #
-        #     coords = node.coords
-        #     d = 3
-        #     offsets = np.indices((3,) * d) - 1
-        #     reshaped_offsets = np.stack(offsets, axis=d).reshape(-1, d)
-        #     offsets_without_middle_point = np.delete(reshaped_offsets, int(d**3 / 2), axis=0)
-        #     neighbours = offsets_without_middle_point + coords
-        #     neighbours = neighbours.tolist()
-        final_neighbours = set()
-        for node in self.tree._node_list:
-            coords = node.coords
-            neighbours = self.tree._get_neighbours(node.coords)
-
-            for neighbour in neighbours:
-                if neighbour not in self.tree._node_list:
-                    if 0 < neighbour[1] < self.N - 1:
-                        # final_neighbours.add(tuple(self.boundaries(neighbour)))
-                        final_neighbours.add(tuple(self.tree.boundaries(neighbour)))
-
-        self.candidates = final_neighbours
-
     # check if the move doesn't go in the cluster
-    def check_move(self, set):
-        if set in self.cluster:
+    def check_move(self, coord):
+        if coord in self.tree:
             return False
         else:
             return True
@@ -104,13 +41,9 @@ class C():
             rndm3 = random.randrange(self.N)
             walker = [rndm2, 0, rndm1]
             walker_p.append(walker)
-        #
-        # # create walker
-        # rndm1 = random.randrange(self.N)
-        # rndm2 = random.randrange(self.N)
-        # walker_p = [rndm2, 0, rndm1]
 
-        self.growth_candidates()
+        candidates = self.tree.growth_candidates()
+
         self.walking = True
         no_match = True
         check_stick = True
@@ -125,7 +58,7 @@ class C():
                 # take step in direction UP
                 if rndm_direc == 0:
                     if walker_p[w][0] - 1 >= 0:
-                        if self.check_move(tuple([walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]])):
+                        if self.check_move([walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]]):
                             walker_p[w] = [walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]]
                         else:
                             check_stick = False
@@ -136,18 +69,18 @@ class C():
                 # take step in direction RIGHT
                 elif rndm_direc == 1:
                     if (walker_p[w][1] + 1) > (self.N - 1):
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][0], walker_p[w][2]])):
+                        if self.check_move([walker_p[w][0], walker_p[w][0], walker_p[w][2]]):
                             walker_p[w] = [walker_p[w][0], 0, walker_p[w][2]]
                         else:
                             check_stick = False
                     else:
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]])):
+                        if self.check_move([walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]]):
                             walker_p[w] = [walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]]
 
                 # take step in direction DOWN
                 elif rndm_direc == 2:
                     if walker_p[w][0] + 1 <= (self.N - 1):
-                        if self.check_move(tuple([walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]])):
+                        if self.check_move([walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]]):
                             walker_p[w] = [walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]]
                         else:
                             check_stick = False
@@ -158,12 +91,12 @@ class C():
                 # take step in direction LEFT
                 elif rndm_direc == 3:
                     if (walker_p[w][1] - 1) < 0:
-                        if self.check_move(tuple([walker_p[w][0], self.N - 1, walker_p[w][2]])):
+                        if self.check_move([walker_p[w][0], self.N - 1, walker_p[w][2]]):
                             walker_p[w] = [walker_p[w][0], self.N - 1, walker_p[w][2]]
                         else:
                             check_stick = False
                     else:
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]])):
+                        if self.check_move([walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]]):
                             walker_p[w] = [walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]]
                         else:
                             check_stick = False
@@ -171,7 +104,7 @@ class C():
                 # take step in direction BACK (Z DOWN)
                 elif rndm_direc == 5:
                     if walker_p[w][2] - 1 >= 0:
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1])):
+                        if self.check_move([walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1]):
                             walker_p[w] = [walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1]
                         else:
                             check_stick = False
@@ -181,7 +114,7 @@ class C():
                 # take step in direction FRONT (Z UP)
                 elif rndm_direc == 4:
                     if (walker_p[w][2] + 1) > (self.N - 1):
-                        if self.check_move(tuple([walker_p[w][0], walker_p[w][1], walker_p[w][2] + 1])):
+                        if self.check_move([walker_p[w][0], walker_p[w][1], walker_p[w][2] + 1]):
                             walker_p[w] = [walker_p[w][0], 0, walker_p[w][2]]
                         else:
                             check_stick = False
@@ -189,15 +122,11 @@ class C():
                         walker_p[w] = [walker_p[w][0], walker_p[w][1], 0]
 
                 if check_stick == True:
-                    for i, j, k in self.candidates:
-                        if i == walker_p[w][0] and j == walker_p[w][1] and k == walker_p[w][2]:
+                    for i, j, k in candidates:
+                        if [i, j, k] == walker_p[w]:
                             x = random.random()
                             if x > p_stick:
-                                self.clusters.add(tuple([i, j, k]))
-                                self.cluster[i][j][k] = 1
-
                                 self.tree.add([i, j, k], creation_time)
-
                                 no_match = False
                                 self.walking = False
                                 break
@@ -221,11 +150,9 @@ for i in tqdm(range(600)):
     c.walking = True
 
 # cluster
-for i in range(N):
-    for j in range(N):
-        for k in range(N):
-            if c.cluster[i][j][k] == 1:
-                c.c[i][j][k] = float('nan')
+for node in c.tree:
+    i, j, k = node.coords
+    c.c[i][j][k] = float('nan')
 
 c.tree._plot3d()
 
@@ -233,7 +160,7 @@ c.tree._plot3d()
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-for list_of_point in c.clusters:
+for list_of_point in c.tree:
     ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
 
 ax.axes.set_xlim3d(left=0, right=N)
@@ -244,11 +171,9 @@ plt.show()
 # 2D plotting
 c_list =  [[0 for i in range(N)] for j in range(N)]
 
-for i in range(N):
-    for j in range(N):
-        for k in range(N):
-            if c.cluster[i][j][k] == 1:
-                c_list[i][j] = float('nan')
+for node in c.tree:
+    i, j, k = node.coords
+    c_list[i][j] = float('nan')
 
 fig, axs = plt.subplots(1, 1)
 axs.imshow(c_list, cmap = 'cubehelix')

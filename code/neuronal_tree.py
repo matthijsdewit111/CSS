@@ -29,7 +29,7 @@ class Node:
         self.child_nodes.append(new_node)
         self.is_leaf = False
         return new_node
-    
+
     def remove_child(self, node):
         self.child_nodes.remove(node)
         if len(self.child_nodes) == 0:
@@ -96,7 +96,7 @@ class Tree:
         assert len(coords) == self._dimensionality
 
         # assign a random parent in range to the new node
-        parent = rng.choice(self._get_neighbours(coords))
+        parent = rng.choice(self._get_neighbour_nodes(coords))
         new_node = parent.add_child(coords, creation_time)
 
         self.system_time = creation_time
@@ -108,6 +108,20 @@ class Tree:
         self.prune(0.4, 40)
 
         return new_node
+
+    def growth_candidates(self):
+        # create a set for all possible growth candidates
+        candidates = set()
+
+        for node in self:
+            neighbours = self._get_neighbour_coords(node.coords)
+
+            for neighbour in neighbours:
+                if neighbour not in self:
+                    if self.bounds[1][0] < neighbour[1] < self.bounds[1][1] - 1:
+                        candidates.add(tuple(self.boundaries(neighbour)))
+
+        return candidates
 
     def boundaries(self, coords):
         peridoic_directions = [0, 2]  # X and Z, Y not
@@ -126,7 +140,7 @@ class Tree:
     def get_root(self):
         return self._root
 
-    def _get_neighbours(self, coords):
+    def _get_neighbour_coords(self, coords):
         # calculate coords of all neighbours (Moore neighborhood) around a center coord
         d = self._dimensionality
         offsets = np.indices((3,) * d) - 1
@@ -136,8 +150,12 @@ class Tree:
         neighbours = neighbours.tolist()
         neighbours = [self.boundaries(neighbour) for neighbour in neighbours]
 
-        # return nodes that are neighbours
-        return [node for node in self._node_list if node.coords in neighbours]
+        return neighbours
+
+    def _get_neighbour_nodes(self, coords):
+        # get all nodes that are neighbours of a center coord
+        neighbours = self._get_neighbour_coords(coords)
+        return [node for node in self if node.coords in neighbours]
 
     def _plot2d(self):
         fig, ax = plt.subplots(1, 1)
