@@ -18,7 +18,7 @@ class Node:
         self.parent_node = parent_node
         self.child_nodes = []
         self.is_leaf = True
-        
+
 
         if parent_node is None:
             self.depth = 0
@@ -76,7 +76,8 @@ class Tree:
                     leafs.append([self._node_list[i], i])
 
         # invert the list to remove from the back of the lists
-        leafs = leafs[::-1] 
+        leafs = leafs[::-1]
+        print("leafs",leafs)
 
         # remove the nodes with chance p
         for node, index in leafs:
@@ -98,18 +99,19 @@ class Tree:
         # adds a new node and prunes
 
         assert len(coords) == self._dimensionality
-        
+
         # assign a random parent in range to the new node
-        parent = rng.choice(self._get_neighbours(coords))
+        # parent = rng.choice(self._get_neighbours(coords))
+        parent = np.random.choice(self._get_neighbours(coords))
         new_node = parent.add_child(coords, creation_time)
 
         self.system_time = creation_time
 
         self._node_list.append(new_node)
         self._coords_list.append(coords)
-        self._matrix_form[tuple(coords)] = 1    
+        self._matrix_form[tuple(coords)] = 1
 
-        self.prune(0.4, 40)
+        self.prune(0.4, 25)
 
         return new_node
 
@@ -124,9 +126,9 @@ class Tree:
             new_coords =  [new_coords[0], new_coords[1], self.bounds[2][1] - 1]
         if k > self.bounds[2][1] - 1:
             new_coords =  [new_coords[0], new_coords[1], 0]
-        
+
         return new_coords
-        
+
 
     def get_root(self):
         return self._root
@@ -173,7 +175,7 @@ class Tree:
             if node.parent_node:
                 parent = node.parent_node
                 ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='black')
-        
+
         # For plotting the leafs, not neccessary just keeping it here for now
 
         # leafs = []
