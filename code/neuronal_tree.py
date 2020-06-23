@@ -127,7 +127,7 @@ class Tree:
 
     def boundaries(self, coords):
         peridoic_directions = [0, 2]  # X and Z, Y not
-        new_coords = coords
+        new_coords = coords.copy()
         for i, coord in enumerate(coords):
             if i not in peridoic_directions:
                 continue

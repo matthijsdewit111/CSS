@@ -19,14 +19,80 @@ class C():
         self.walking = True
         self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]])
 
+        self.transformations = {
+            0: self.up,
+            1: self.down,
+            2: self.left,
+            3: self.right,
+            4: self.forward,
+            5: self.backward
+        }
+
     # check if the move doesn't go in the cluster
     def check_move(self, coord):
-        if coord in self.tree:
-            return False
-        else:
-            return True
+        return coord not in self.tree
+
+    # assume tree is growing downwards
+    def up(self, walker_p):
+        # Y + 1
+        new_walker_p = walker_p.copy()
+        new_walker_p[1] += 1
+
+        if new_walker_p[1] > self.N - 1:
+            # respawn at Y=0 when moving past Y_max
+            new_walker_p[1] = 0
+
+        return new_walker_p
+    
+    def down(self, walker_p):
+        # Y - 1
+        new_walker_p = walker_p.copy()
+        new_walker_p[1] -= 1
+
+        if new_walker_p[1] < 0:
+            # dont go lower than Y=0
+            new_walker_p[1] = 0
+
+        return new_walker_p
+
+    def left(self, walker_p):
+        # X - 1
+        new_walker_p = walker_p.copy()
+        new_walker_p[0] -= 1
+
+        new_walker_p = self.tree.boundaries(new_walker_p)
+
+        return new_walker_p
+    
+    def right(self, walker_p):
+        # X + 1
+        new_walker_p = walker_p.copy()
+        new_walker_p[0] += 1
+
+        new_walker_p = self.tree.boundaries(new_walker_p)
+
+        return new_walker_p
+    
+    def forward(self, walker_p):
+        # Z + 1
+        new_walker_p = walker_p.copy()
+        new_walker_p[2] += 1
+
+        new_walker_p = self.tree.boundaries(new_walker_p)
+
+        return new_walker_p
+    
+    def backward(self, walker_p):
+        # Z - 1
+        new_walker_p = walker_p.copy()
+        new_walker_p[2] -= 1
+
+        new_walker_p = self.tree.boundaries(new_walker_p)
+
+        return new_walker_p
 
     # walk untill stuck to a candidate
+
     def walker(self, p_stick, creation_time):
 
         # create list of walkers
@@ -34,7 +100,6 @@ class C():
         for w in range(1):
             rndm1 = random.randrange(self.N)
             rndm2 = random.randrange(self.N)
-            rndm3 = random.randrange(self.N)
             walker = [rndm2, 0, rndm1]
             walker_p.append(walker)
 
@@ -48,74 +113,15 @@ class C():
         while no_match == True:
 
             for w in range(len(walker_p)):
-
+                # print(walker_p[w])
                 rndm_direc = random.randrange(6)
 
-                # take step in direction UP
-                if rndm_direc == 0:
-                    if walker_p[w][0] - 1 >= 0:
-                        if self.check_move([walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]]):
-                            walker_p[w] = [walker_p[w][0] - 1, walker_p[w][1], walker_p[w][2]]
-                        else:
-                            check_stick = False
-                    else:
-                        rndm = random.randrange(self.N)
-                        walker_p[w] = [0, rndm, walker_p[w][2]] # walker 2 of 0?
+                new_walker_p = self.transformations[rndm_direc](walker_p[w])
 
-                # take step in direction RIGHT
-                elif rndm_direc == 1:
-                    if (walker_p[w][1] + 1) > (self.N - 1):
-                        if self.check_move([walker_p[w][0], walker_p[w][0], walker_p[w][2]]):
-                            walker_p[w] = [walker_p[w][0], 0, walker_p[w][2]]
-                        else:
-                            check_stick = False
-                    else:
-                        if self.check_move([walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]]):
-                            walker_p[w] = [walker_p[w][0], walker_p[w][1] + 1, walker_p[w][2]]
-
-                # take step in direction DOWN
-                elif rndm_direc == 2:
-                    if walker_p[w][0] + 1 <= (self.N - 1):
-                        if self.check_move([walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]]):
-                            walker_p[w] = [walker_p[w][0] + 1, walker_p[w][1], walker_p[w][2]]
-                        else:
-                            check_stick = False
-                    else:
-                        rndm = random.randrange(self.N)
-                        walker_p[w] = [rndm, 0, rndm]
-
-                # take step in direction LEFT
-                elif rndm_direc == 3:
-                    if (walker_p[w][1] - 1) < 0:
-                        if self.check_move([walker_p[w][0], self.N - 1, walker_p[w][2]]):
-                            walker_p[w] = [walker_p[w][0], self.N - 1, walker_p[w][2]]
-                        else:
-                            check_stick = False
-                    else:
-                        if self.check_move([walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]]):
-                            walker_p[w] = [walker_p[w][0], walker_p[w][1] - 1, walker_p[w][2]]
-                        else:
-                            check_stick = False
-
-                # take step in direction BACK (Z DOWN)
-                elif rndm_direc == 5:
-                    if walker_p[w][2] - 1 >= 0:
-                        if self.check_move([walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1]):
-                            walker_p[w] = [walker_p[w][0], walker_p[w][1], walker_p[w][2] - 1]
-                        else:
-                            check_stick = False
-                    else:
-                        walker_p[w] = [walker_p[w][0], walker_p[w][1], self.N - 1]
-
-                # take step in direction FRONT (Z UP)
-                elif rndm_direc == 4:
-                    if (walker_p[w][2] + 1) > (self.N - 1):
-                        if self.check_move([walker_p[w][0], walker_p[w][1], walker_p[w][2] + 1]):
-                            walker_p[w] = [walker_p[w][0], 0, walker_p[w][2]]
-                        else:
-                            check_stick = False
-                    else:
-                        walker_p[w] = [walker_p[w][0], walker_p[w][1], 0]
+                if self.check_move(new_walker_p):
+                    walker_p[w] = new_walker_p
+                else:
+                    check_stick = False
 
                 if check_stick == True:
                     for i, j, k in candidates:
@@ -137,7 +143,7 @@ N = 50
 p_stick = 0
 # fig, axs = plt.subplots(1, 1)
 
-c = C(seed = [N//2, N - 1, N//2], N = N)
+c = C(seed=[N//2, N - 1, N//2], N=N)
 
 # number of points
 for i in tqdm(range(600)):
@@ -152,7 +158,7 @@ for node in c.tree:
 
 c.tree._plot3d()
 
-## 3D plotting
+# 3D plotting
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
@@ -166,14 +172,14 @@ ax.axes.set_zlim3d(bottom=0, top=N)
 plt.show()
 
 # 2D plotting
-c_list =  [[0 for i in range(N)] for j in range(N)]
+c_list = [[0 for i in range(N)] for j in range(N)]
 
 for node in c.tree:
     i, j, k = node.coords
     c_list[i][j] = float('nan')
 
 fig, axs = plt.subplots(1, 1)
-axs.imshow(c_list, cmap = 'cubehelix')
+axs.imshow(c_list, cmap='cubehelix')
 axs.set_title("P stick : {}".format(p_stick))
 axs.set_xlabel("x position [-]")
 axs.set_ylabel("y position [-]")
