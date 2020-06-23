@@ -114,16 +114,17 @@ class Tree:
         return new_node
 
     def boundaries(self, coords):
-        i, j, k = coords
+        peridoic_directions = [0, 2] # X and Z, Y not
+
         new_coords = coords
-        if i < 0:
-            new_coords =  [self.bounds[0][1] - 1, new_coords[1], new_coords[2]]
-        if i > self.bounds[0][1] - 1:
-            new_coords =  [0, new_coords[1], new_coords[2]]
-        if k < 0:
-            new_coords =  [new_coords[0], new_coords[1], self.bounds[2][1] - 1]
-        if k > self.bounds[2][1] - 1:
-            new_coords =  [new_coords[0], new_coords[1], 0]
+        for i, coord in enumerate(coords):
+            if i not in peridoic_directions:
+                continue
+            
+            if coord < self.bounds[i][0]:
+                new_coords[i] = self.bounds[i][1] - 1
+            elif coord > self.bounds[i][1] - 1:
+                new_coords[i] = self.bounds[i][0]
         
         return new_coords
         
@@ -155,7 +156,15 @@ class Tree:
         for node in self:
             if node.parent_node:
                 parent = node.parent_node
-                ax.plot([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], c='black')
+                xp, yp = parent.coords
+                xc, yc = node.coords
+
+                if xp == self.bounds[0][0] and xc == self.bounds[0][1] - 1:
+                    xp = self.bounds[0][1]
+                elif xp == self.bounds[0][1] - 1 and xc == self.bounds[0][0]:
+                    xp = self.bounds[0][0] - 1
+
+                ax.plot([xp, xc], [yp, yc], c='black')
         plt.show()
 
     def _plot3d(self):
@@ -172,7 +181,20 @@ class Tree:
         for node in self._node_list:
             if node.parent_node:
                 parent = node.parent_node
-                ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='black')
+                xp, yp, zp = parent.coords
+                xc, yc, zc = node.coords
+
+                if xp == self.bounds[0][0] and xc == self.bounds[0][1] - 1:
+                    xp = self.bounds[0][1]
+                elif xp == self.bounds[0][1] - 1 and xc == self.bounds[0][0]:
+                    xp = self.bounds[0][0] - 1
+
+                if zp == self.bounds[2][0] and zc == self.bounds[2][1] - 1:
+                    zp = self.bounds[2][1]
+                if zp == self.bounds[2][1] - 1 and zc == self.bounds[2][0]:
+                    zp = self.bounds[2][0] - 1
+
+                ax.plot3D([xp, xc], [yp, yc], [zp, zc], c='black')
         
         # For plotting the leafs, not neccessary just keeping it here for now
 
@@ -199,21 +221,19 @@ class Tree:
 
 if __name__ == "__main__":
     # plot a 2d test tree
-    tree2d = Tree([5, 0], bounds=[[0, 10], [0, 10]])
-    tree2d.add([5, 1], 1)
-    tree2d.add([6, 1], 2)
-    tree2d.add([4, 1], 3)
-    tree2d.add([5, 2], 4)
-    tree2d.add([5, 3], 5)
-    tree2d.plot()
-
-    print(tree2d._get_neighbours([6, 2]))
+    tree2d = Tree([0, 0], bounds=[[0, 10], [0, 10]])
+    tree2d.add([0, 1], 1)
+    tree2d.add([1, 1], 2)
+    tree2d.add([9, 1], 3)
+    tree2d.add([9, 2], 4)
+    tree2d.add([9, 3], 5)
+    # tree2d.plot()
 
     # plot a 3d test tree
-    tree3d = Tree([5, 0, 5], bounds=[[0, 10], [0, 10], [0, 10]])
-    tree3d.add([5, 1, 5], 1)
-    tree3d.add([6, 1, 5], 2)
-    tree3d.add([4, 1, 5], 3)
-    tree3d.add([5, 2, 5], 4)
-    tree3d.add([5, 2, 4], 5)
+    tree3d = Tree([0, 0, 0], bounds=[[0, 10], [0, 10], [0, 10]])
+    tree3d.add([0, 1, 0], 1)
+    tree3d.add([1, 1, 0], 2)
+    tree3d.add([9, 1, 0], 3)
+    tree3d.add([9, 2, 0], 4)
+    tree3d.add([9, 2, 9], 5)
     tree3d.plot()
