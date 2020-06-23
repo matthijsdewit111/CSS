@@ -92,7 +92,7 @@ class Tree:
                 self._node_list.pop(index)
                 self._coords_list.pop(index)
 
-
+    def add(self, coords, creation_time):
         # adds a new node and prunes
 
         assert len(coords) == self._dimensionality
