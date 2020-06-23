@@ -16,13 +16,14 @@
   }
   </style>
 </head>
+
 <body>
 
 <div class="jumbotron title text-center" style="margin-bottom:0">
   <h2 id="title">Simulating neuronal dendrites with diffusion-limited aggregation</h2>
 </div>
 
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top" id="navbar">
   <a class="navbar-brand" href="index.html">Overview</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
     <span class="navbar-toggler-icon"></span>
@@ -33,10 +34,10 @@
         <a class="nav-link" href="templates/theory.html">Theory</a>
       </li>
       <li class="navbar-brand">
-        <a class="nav-link" href="#">Model</a>
+        <a class="nav-link" href="templates/model.html">Model</a>
       </li>
       <li class="navbar-brand">
-        <a class="nav-link" href="#">Results</a>
+        <a class="nav-link" href="templates/results.html">Results</a>
       </li>
     </ul>
   </div>
@@ -45,22 +46,30 @@
 <div class="container" style="margin-top:30px">
   <div class="row">
     <div class="col-sm-4">
-      <h2>Project outline</h2>
-
-      <p>Dendrite formation is modelled in 3D using DLA.</p>
-
+      <div class="grey-box">
+        <h2>Project outline</h2>
+        <!-- <br> -->
+        <text style="font-weight:bold;">System:</text><p>Neuronal dendrites</p>
+        <text style="font-weight:bold;">Method:</text><p>Diffusion-limited aggregation (DLA)</p>
+      </div>
+      <br>
+      <div class="grey-box">
+        <h2>Reference</h2>
+        <!-- <br> -->
+        <a>Based on the </a><a href="https://arxiv.org/ftp/q-bio/papers/0605/0605021.pdf" target="_blank">paper</a><a> "Spatial embedding of neuronal trees modeled by diffusive growth" by A. Luczak (2006)</a>
+      </div>
+      <br>
     </div>
-    <div class="col-sm-8">
 
+    <div class="col-sm-8">
       <div class="text-center">
-      <h2>DLA implementation</h2><br>
+      <h2>Implementation in 2D & 3D</h2><br>
       <text>Dendrites grow in response to a signalling gradient</text>
       <br>
       <h4>VS</h4>
       <text>Particles undergo random walk and cluster together to form the dendrite</text>
       <img src="https://github.com/matthijsdewit111/CSS/blob/master/static/img/movie_smooth.gif?raw=true" alt="GIF">
       </div>
-
     </div>
   </div>
 </div>
@@ -77,14 +86,13 @@
 
       <!-- Grid column -->
       <div class="col-md-4 ">
-
-        <!-- Content -->
         <h5 class="font-weight-bold text-uppercase mb-4">Project</h5><hr>
         <text>MSc Computational Science</text>
         <br>
         <text>Course:</text>
         <text>Complex System Simulation</text>
-
+        <br>
+        <a href="https://github.com/matthijsdewit111/CSS">Github</a>
       </div>
       <!-- Grid column -->
 
