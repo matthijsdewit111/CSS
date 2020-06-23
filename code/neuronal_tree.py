@@ -10,6 +10,7 @@ Tree._matrix_form
 Node.depth (I think haven't investigated how pruning affected this)
 """
 
+
 class Node:
     def __init__(self, coords, creation_time, parent_node):
         self.coords = coords
@@ -17,7 +18,6 @@ class Node:
         self.parent_node = parent_node
         self.child_nodes = []
         self.is_leaf = True
-
 
         if parent_node is None:
             self.depth = 0
@@ -29,6 +29,11 @@ class Node:
         self.child_nodes.append(new_node)
         self.is_leaf = False
         return new_node
+    
+    def remove_child(self, node):
+        self.child_nodes.remove(node)
+        if len(self.child_nodes) == 0:
+            self.is_leaf = True
 
     def __iter__(self):
         yield self
@@ -67,31 +72,23 @@ class Tree:
         # with a probability p
 
         leafs = []
-
         # leafs that meet the requirements
-        for i in range(1, len(self._node_list)):
-            if self._node_list[i].is_leaf:
-                if self.system_time - 5 > self._node_list[i].creation_time > self.system_time - PS:
-                    leafs.append([self._node_list[i], i])
-
-        # invert the list to remove from the back of the lists
-        leafs = leafs[::-1]
+        for node in self:
+            if node.is_leaf:
+                if self.system_time - 5 > node.creation_time > self.system_time - PS:
+                    leafs.append(node)
 
         # remove the nodes with chance p
-        for node, index in leafs:
+        for node in leafs:
             rndm = random.random()
             if rndm < p:
                 print("node will be removed:", node)
-                parent = self._node_list[index].parent_node
-
-                # make parent leaf when its only child is removed
-                if len(parent.child_nodes) == 1:
-                    parent.is_leaf = True
+                parent = node.parent_node
 
                 # remove the node
-                self._node_list.pop(index)
-                self._coords_list.pop(index)
-
+                parent.remove_child(node)
+                self._node_list.remove(node)
+                self._coords_list.remove(node.coords)
 
     def add(self, coords, creation_time):
         # adds a new node and prunes
@@ -113,8 +110,7 @@ class Tree:
         return new_node
 
     def boundaries(self, coords):
-        peridoic_directions = [0, 2] # X and Z, Y not
-
+        peridoic_directions = [0, 2]  # X and Z, Y not
         new_coords = coords
         for i, coord in enumerate(coords):
             if i not in peridoic_directions:
@@ -126,7 +122,6 @@ class Tree:
                 new_coords[i] = self.bounds[i][0]
 
         return new_coords
-
 
     def get_root(self):
         return self._root
@@ -177,7 +172,7 @@ class Tree:
         ax.set_zlabel("z")
         ax.view_init(0, 0)
 
-        for node in self._node_list:
+        for node in self:
             if node.parent_node:
                 parent = node.parent_node
                 xp, yp, zp = parent.coords
@@ -190,7 +185,7 @@ class Tree:
 
                 if zp == self.bounds[2][0] and zc == self.bounds[2][1] - 1:
                     zp = self.bounds[2][1]
-                if zp == self.bounds[2][1] - 1 and zc == self.bounds[2][0]:
+                elif zp == self.bounds[2][1] - 1 and zc == self.bounds[2][0]:
                     zp = self.bounds[2][0] - 1
 
                 ax.plot3D([xp, xc], [yp, yc], [zp, zc], c='black')
@@ -226,7 +221,7 @@ if __name__ == "__main__":
     tree2d.add([9, 1], 3)
     tree2d.add([9, 2], 4)
     tree2d.add([9, 3], 5)
-    # tree2d.plot()
+    tree2d.plot()
 
     # plot a 3d test tree
     tree3d = Tree([0, 0, 0], bounds=[[0, 10], [0, 10], [0, 10]])
