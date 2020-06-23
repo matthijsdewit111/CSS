@@ -73,7 +73,7 @@ class Tree:
 
         leafs = []
         # leafs that meet the requirements
-        for node in self._node_list:
+        for node in self:
             if node.is_leaf:
                 if self.system_time - 5 > node.creation_time > self.system_time - PS:
                     leafs.append(node)
@@ -172,7 +172,7 @@ class Tree:
         ax.set_zlabel("z")
         ax.view_init(0, 0)
 
-        for node in self._node_list:
+        for node in self:
             if node.parent_node:
                 parent = node.parent_node
                 xp, yp, zp = parent.coords
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     tree2d.add([9, 1], 3)
     tree2d.add([9, 2], 4)
     tree2d.add([9, 3], 5)
-    # tree2d.plot()
+    tree2d.plot()
 
     # plot a 3d test tree
     tree3d = Tree([0, 0, 0], bounds=[[0, 10], [0, 10], [0, 10]])
