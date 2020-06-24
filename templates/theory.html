@@ -38,6 +38,9 @@
       <li class="navbar-brand">
         <a class="nav-link" href="results.html">Results</a>
       </li>
+      <li class="navbar-brand">
+        <a class="nav-link" href="conclusion.html">Conclusion</a>
+      </li>
     </ul>
   </div>
 </nav>
@@ -79,18 +82,18 @@
     <img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fhan.wicmb.cornell.edu%2Ffiles%2F2014%2F03%2Ftumblr-optmz-1mkxicj.jpg&f=1&nofb=1" alt="dla" width="200px" height="200px"></img>
     <br><br>
   </div>
-  <div class="col-md-5">
+  <div class="col-md-6">
     <h3>Dendritic branching</h3>
     <p>Ramón y Cajal (1888)</p>
     <!-- <p>i.e. dendritic arborisation -->
     <ul>
-      <li>Multi-step biological process</li>
-      <li>Neurons form new dendritic trees and branches</li>
-      <li>Varying morphology depending on function of the neuron</li>
-      <li>e.g. branch density and grouping patterns </li>
+      <li>Multi-step biological process: neurons form new dendritic branches</li>
+      <li>Varying morphology depending on function (type) of the neuron</li>
+      <li>Extent to which intrinsic and extrinsic factors shape dendritic geometry remains largely unknown (Scott and Luo, 2001)</li>
+      <li>Complex interactions between different factors during development &rarr; difficult to separate their contributions experimentally</li>
     </ul>
   </div>
-  <div class="col-md-2"></div>
+  <div class="col-md-1"></div>
 </div>
 <hr style="width:70%;">
 <div class="row">
@@ -101,10 +104,11 @@
     <h3>Modelling dendrites with DLA</h3>
     <p>A. Luczak (2006)
     <ul>
-      <li>Multi-step biological process</li>
-      <li>Neurons form new dendritic trees and branches</li>
-      <li>Varying morphology depending on function of the neuron</li>
-      <li>e.g. branch density and grouping patterns </li>
+      <li>Computationally model dendritic development</li>
+      <li>Reproduce spatial embedding of different types of neurons</li>
+      <li>External factors: space available for growth & spatial distribution of ‘neurotrophic particles’ (NPs)</li>
+      <li>Conclusion: Succesfully created complex and diverse 3D trees strictly similar to observed neuronal shapes (no intrinsic factors needed)</li>
+      <li>(WHAT WE COULD DO: change only intrinsic factor (pruning span) & see if this can also be sufficient to reproduce shapes)
     </ul>
   </div>
   <div class="col-md-3">
@@ -124,11 +128,14 @@
     <br>
     <h3>Research question & hypothesis</h3><br>
     <ul>
-      <a style="font-size: 27px">&rarr;  </a><a style="font-size: 18px">Can dendrites be modelled using DLA?</a><br><br>
-      <a style="font-size: 27px">&rarr;  <a style="font-size: 18px">How does pruning affect dendritic spines in the computational model?</a><br><br>
-      <a style="font-size: 27px">&rarr;  <a style="font-size: 18px">Is the DLA model biologically relevant?</a><br><br>
+      <!-- <a style="font-size: 27px">&rarr;  </a><a style="font-size: 18px">To what extent can diffusion-limited aggregation reproduce various types of neuronal dendrites by including pruning?</a><br><br> -->
+      <a style="font-size: 27px">&rarr;  <a style="font-size: 18px">To what extent can various types of neuronal dendrite be simulated by pruning of a diffusion-limited aggregation model?</a><br><br>
+      <!-- <a style="font-size: 27px">&rarr;  <a style="font-size: 18px">To what extent can various types of neuronal dendrite be reproduced using diffusion-limited aggregation including pruning</a><br><br> -->
       <br>
     </ul>
+    <br>
+    <img src="../static/img/cells.png" alt="dla" width="500px" height="120px"></img><br>
+    <br>
   </div>
   <div class="col-md-2"></div>
 </div>

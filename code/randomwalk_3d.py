@@ -7,17 +7,15 @@ from tqdm import tqdm
 
 from neuronal_tree import Tree
 
-t1 = time.time()
-
 
 class C():
     # the diffusion class. Owns a C.c which is the matrix with all the information
-    def __init__(self, seed, N):
+    def __init__(self, seed, N, PS=40):
         self.N = N
         self.dx = 1/N
         self.c = [[[0 for i in range(N)] for j in range(N)] for k in range(N)]
         self.walking = True
-        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]])
+        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]], PS=PS)
 
         self.transformations = {
             0: self.up,
@@ -137,54 +135,61 @@ class C():
                 check_stick = True
 
 
-N = 70
+if __name__ == "__main__":
+    t1 = time.time()
 
-# controls the chance of the random walker sticking to the cluster
-# higher means lower chance
-p_stick = 0
-# fig, axs = plt.subplots(1, 1)
+    N = 70
 
-c = C(seed=[N//2, N - 1, N//2], N=N)
+    # controls the chance of the random walker sticking to the cluster
+    # higher means lower chance
+    p_stick = 0
+    # fig, axs = plt.subplots(1, 1)
 
-# number of points
-for i in tqdm(range(500)):
-    while (c.walking == True):
-        c.walker(p_stick, i + 1)
-    c.walking = True
+<<<<<<< HEAD
+c = C(seed=[N//2, N - 1, N//2], N=N, PS=40)
+=======
+    c = C(seed=[N//2, N - 1, N//2], N=N)
+>>>>>>> 631e4cd7e9038dd2c1c35b28999e4ea80909842f
 
-# cluster
-for node in c.tree:
-    i, j, k = node.coords
-    c.c[i][j][k] = float('nan')
+    # number of points
+    for i in tqdm(range(500)):
+        while (c.walking == True):
+            c.walker(p_stick, i + 1)
+        c.walking = True
 
-c.tree._plot3d()
+    # cluster
+    for node in c.tree:
+        i, j, k = node.coords
+        c.c[i][j][k] = float('nan')
 
-# 3D plotting
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+    t2 = time.time()
+    print(t2-t1, "TIME")
 
-for node in c.tree:
-    list_of_point = node.coords
-    ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
+    c.tree._plot3d()
 
-ax.axes.set_xlim3d(left=0, right=N)
-ax.axes.set_ylim3d(bottom=0, top=N)
-ax.axes.set_zlim3d(bottom=0, top=N)
-plt.show()
+    # 3D plotting
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-# 2D plotting
-c_list = [[0 for i in range(N)] for j in range(N)]
+    for node in c.tree:
+        list_of_point = node.coords
+        ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
 
-for node in c.tree:
-    i, j, k = node.coords
-    c_list[i][j] = float('nan')
+    ax.axes.set_xlim3d(left=0, right=N)
+    ax.axes.set_ylim3d(bottom=0, top=N)
+    ax.axes.set_zlim3d(bottom=0, top=N)
+    plt.show()
 
-fig, axs = plt.subplots(1, 1)
-axs.imshow(c_list, cmap='cubehelix')
-axs.set_title("P stick : {}".format(p_stick))
-axs.set_xlabel("x position [-]")
-axs.set_ylabel("y position [-]")
-plt.show()
+    # 2D plotting
+    c_list = [[0 for i in range(N)] for j in range(N)]
 
-t2 = time.time()
-print(t2-t1, "TIME")
+    for node in c.tree:
+        i, j, k = node.coords
+        c_list[i][j] = float('nan')
+
+    fig, axs = plt.subplots(1, 1)
+    axs.imshow(c_list, cmap='cubehelix')
+    axs.set_title("P stick : {}".format(p_stick))
+    axs.set_xlabel("x position [-]")
+    axs.set_ylabel("y position [-]")
+    plt.show()
