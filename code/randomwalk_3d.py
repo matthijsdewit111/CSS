@@ -43,7 +43,7 @@ class C():
             new_walker_p[1] = 0
 
         return new_walker_p
-    
+
     def down(self, walker_p):
         # Y - 1
         new_walker_p = walker_p.copy()
@@ -63,7 +63,7 @@ class C():
         new_walker_p = self.tree.boundaries(new_walker_p)
 
         return new_walker_p
-    
+
     def right(self, walker_p):
         # X + 1
         new_walker_p = walker_p.copy()
@@ -72,7 +72,7 @@ class C():
         new_walker_p = self.tree.boundaries(new_walker_p)
 
         return new_walker_p
-    
+
     def forward(self, walker_p):
         # Z + 1
         new_walker_p = walker_p.copy()
@@ -81,7 +81,7 @@ class C():
         new_walker_p = self.tree.boundaries(new_walker_p)
 
         return new_walker_p
-    
+
     def backward(self, walker_p):
         # Z - 1
         new_walker_p = walker_p.copy()
@@ -136,7 +136,7 @@ class C():
                 check_stick = True
 
 
-N = 50
+N = 70
 
 # controls the chance of the random walker sticking to the cluster
 # higher means lower chance
@@ -146,7 +146,7 @@ p_stick = 0
 c = C(seed=[N//2, N - 1, N//2], N=N)
 
 # number of points
-for i in tqdm(range(600)):
+for i in tqdm(range(500)):
     while (c.walking == True):
         c.walker(p_stick, i + 1)
     c.walking = True
