@@ -147,6 +147,7 @@ if __name__ == "__main__":
 
     t2 = time.time()
     print(t2-t1, "TIME")
+    print(dla_diffusion.tree.get_asymmetry_index())
 
     dla_diffusion.tree.plot()
 
