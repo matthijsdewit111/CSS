@@ -7,8 +7,6 @@ from tqdm import tqdm
 
 from neuronal_tree import Tree
 
-t1 = time.time()
-
 
 class C():
     # the diffusion class. Owns a C.c which is the matrix with all the information
@@ -114,35 +112,37 @@ class C():
                 check_stick = True
 
 
-N = 100
+if __name__ == "__main__":
+    t1 = time.time()
+    
+    N = 100
 
-# controls the chance of the random walker sticking to the cluster
-# higher means lower chance
-p_stick = 0
-# fig, axs = plt.subplots(1, 1)
+    # controls the chance of the random walker sticking to the cluster
+    # higher means lower chance
+    p_stick = 0
+    # fig, axs = plt.subplots(1, 1)
 
-c = C(seed=[N//2, N - 1], N=N)
+    c = C(seed=[N//2, N - 1], N=N)
 
-# number of points
-for i in tqdm(range(500)):
-    while (c.walking == True):
-        c.walker(p_stick, i + 1)
-    c.walking = True
+    # number of points
+    for i in tqdm(range(500)):
+        while (c.walking == True):
+            c.walker(p_stick, i + 1)
+        c.walking = True
 
+    t2 = time.time()
+    print(t2-t1, "TIME")
 
-# 2D plotting
-c_list = [[0 for i in range(N)] for j in range(N)]
+    # 2D plotting
+    c_list = [[0 for i in range(N)] for j in range(N)]
 
-for node in c.tree:
-    i, j = node.coords
-    c_list[i][j] = float(1)
+    for node in c.tree:
+        i, j = node.coords
+        c_list[i][j] = float(1)
 
-fig, axs = plt.subplots(1, 1)
-axs.imshow(c_list, cmap='cubehelix')
-axs.set_title("P stick : {}".format(p_stick))
-axs.set_xlabel("x position [-]")
-axs.set_ylabel("y position [-]")
-plt.show()
-
-t2 = time.time()
-print(t2-t1, "TIME")
+    fig, axs = plt.subplots(1, 1)
+    axs.imshow(c_list, cmap='cubehelix')
+    axs.set_title("P stick : {}".format(p_stick))
+    axs.set_xlabel("x position [-]")
+    axs.set_ylabel("y position [-]")
+    plt.show()

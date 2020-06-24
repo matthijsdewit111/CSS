@@ -4,13 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
-# rng = np.random.default_rng()
-
-"""
-Currently not fully working or implemented
-- Tree._matrix_form
-"""
-
 
 class Node:
     def __init__(self, coords, creation_time, parent_node):
@@ -179,6 +172,7 @@ class Tree:
                 parent.remove_child(node)
                 self._node_list.remove(node)
                 self._coords_list.remove(node.coords)
+                self._matrix_form[tuple(node.coords)] = 0
 
     def add(self, coords, creation_time):
         # adds a new node and prunes
@@ -230,6 +224,9 @@ class Tree:
     def get_root(self):
         return self._root
 
+    def get_matrix(self):
+        return self._matrix_form
+
     def get_asymmetry_index(self):
         A_ps = self._root.get_A_ps()
         return (1/len(A_ps)) * sum(A_ps)
@@ -242,6 +239,35 @@ class Tree:
         nodes_in_terminal_branch = len(self._root.get_nodes_in_terminal_branch())
         intermidiate_nodes = total_nodes - nodes_in_terminal_branch
         return nodes_in_terminal_branch / intermidiate_nodes
+    
+    def get_number_of_terminal_segments(self):
+        # just count number of leafs
+        number_of_terminal_segments = 0
+        for node in self:
+            if node.is_leaf:
+                number_of_terminal_segments += 1
+
+        return number_of_terminal_segments
+
+
+    def get_fractal_dimension(self):
+        Lx = self.bounds[0][1] - self.bounds[0][0]
+        Ly = self.bounds[1][1] - self.bounds[1][0]
+
+        # computing the fractal dimension
+        # considering only scales in a logarithmic list
+        scales = np.logspace(0.01, 1, num=10, endpoint=False, base=2)
+        Ns = []
+        # looping over several scales
+        for scale in scales:
+            # computing the histogram
+            H, edges = np.histogramdd(np.array(self._coords_list), bins=(np.arange(0, Lx, scale), np.arange(0, Ly, scale)))
+            Ns.append(np.sum(H > 0))
+
+        # linear fit, polynomial of degree 1
+        coeffs = np.polyfit(np.log(scales), np.log(Ns), 1)
+
+        return -coeffs[0]
 
     def _get_neighbour_coords(self, coords):
         # calculate coords of all neighbours (Moore neighborhood) around a center coord
@@ -326,7 +352,7 @@ class Tree:
 
     def __len__(self):
         return len(self._node_list)
-    
+
     def __iter__(self):
         return self._root.__iter__()
 
@@ -341,14 +367,14 @@ if __name__ == "__main__":
     # plot a 2d test tree
     tree2d = Tree([5, 0], bounds=[[0, 10], [0, 10]])
     tree2d.add([5, 1], 0)
-    tree2d.add([6, 1], 1)
-    tree2d.add([7, 2], 2)
-    tree2d.add([4, 1], 3)
-    tree2d.add([3, 2], 3)
-    tree2d.add([2, 3], 4)
-    tree2d.add([4, 3], 5)
-    tree2d.add([6, 0], 6)
-    print(tree2d.get_lenghts_ratio())
+    tree2d.add([6, 1], 0)
+    tree2d.add([7, 2], 0)
+    tree2d.add([4, 1], 0)
+    tree2d.add([3, 2], 0)
+    tree2d.add([2, 3], 0)
+    tree2d.add([4, 3], 0)
+    tree2d.add([6, 0], 0)
+    print(tree2d.get_number_of_terminal_segments())
     tree2d.plot()
 
     # # plot a 3d test tree
