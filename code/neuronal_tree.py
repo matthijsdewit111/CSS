@@ -37,6 +37,22 @@ class Node:
         if len(self.child_nodes) == 0:
             self.is_leaf = True
 
+    def get_nodes_in_terminal_branch(self):
+        if self.is_leaf:
+            return [self]
+        
+        # recurse to get all 'above'
+        nodes_in_terminal_branch = []
+        for child in self.child_nodes:
+            for node in child.get_nodes_in_terminal_branch():
+                nodes_in_terminal_branch.append(node)
+        
+        if len(self.child_nodes) == 1 and self.child_nodes[0] in nodes_in_terminal_branch:
+            return nodes_in_terminal_branch + [self]
+        else:
+            return nodes_in_terminal_branch
+
+
     def get_branch_orders(self, order, orders_list):
         if self.is_leaf:
             return []
@@ -221,6 +237,12 @@ class Tree:
     def get_branch_orders(self):
         return self._root.get_branch_orders(0, [])
 
+    def get_lenghts_ratio(self):
+        total_nodes = len(self)
+        nodes_in_terminal_branch = len(self._root.get_nodes_in_terminal_branch())
+        intermidiate_nodes = total_nodes - nodes_in_terminal_branch
+        return nodes_in_terminal_branch / intermidiate_nodes
+
     def _get_neighbour_coords(self, coords):
         # calculate coords of all neighbours (Moore neighborhood) around a center coord
         d = self._dimensionality
@@ -302,6 +324,9 @@ class Tree:
 
         plt.show()
 
+    def __len__(self):
+        return len(self._node_list)
+    
     def __iter__(self):
         return self._root.__iter__()
 
@@ -323,7 +348,7 @@ if __name__ == "__main__":
     tree2d.add([2, 3], 4)
     tree2d.add([4, 3], 5)
     tree2d.add([6, 0], 6)
-    print(tree2d.get_branch_orders())
+    print(tree2d.get_lenghts_ratio())
     tree2d.plot()
 
     # # plot a 3d test tree
