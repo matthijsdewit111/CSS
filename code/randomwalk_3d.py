@@ -12,12 +12,12 @@ t1 = time.time()
 
 class C():
     # the diffusion class. Owns a C.c which is the matrix with all the information
-    def __init__(self, seed, N):
+    def __init__(self, seed, N, PS=40):
         self.N = N
         self.dx = 1/N
         self.c = [[[0 for i in range(N)] for j in range(N)] for k in range(N)]
         self.walking = True
-        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]])
+        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]], PS=PS)
 
         self.transformations = {
             0: self.up,
@@ -144,7 +144,7 @@ N = 70
 p_stick = 0
 # fig, axs = plt.subplots(1, 1)
 
-c = C(seed=[N//2, N - 1, N//2], N=N)
+c = C(seed=[N//2, N - 1, N//2], N=N, PS=40)
 
 # number of points
 for i in tqdm(range(500)):
