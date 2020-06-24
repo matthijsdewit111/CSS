@@ -9,12 +9,10 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from neuronal_tree import Tree
 
-t1 = time.time()
-
 
 class DLA_diff3d():
     # the diffusion class. Owns a DLA_diff3d.c which is the matrix with all the information
-    def __init__(self, seed, eps=10**-5, x = 20, y = 20, z = 20, w=1, eta=1):
+    def __init__(self, seed, eps=10**-5, x=20, y=20, z=20, w=1, eta=1, PS = 40):
         self.x = x
         self.y = y
         self.z = z
@@ -28,12 +26,12 @@ class DLA_diff3d():
         self.w = w
         self.eta = eta
         self.eps = eps
-        self.converged = False 
+        self.converged = False
 
-        self.tree = Tree([x//2, y - 1, z//2], bounds = [[0, x], [0, y], [0, z]])
-
+        self.tree = Tree(seed, bounds=[[0, x], [0, y], [0, z]], PS = PS)
 
     # compute the neighbours in x and z direction, accounting for periodic boundaries
+
     def neighbour2d(self, x, y, z):
         if x + 1 < self.x - 1:
             xp = x + 1
@@ -46,7 +44,7 @@ class DLA_diff3d():
             zp = 0
 
         if x - 1 < 0:
-            xm = self.x - 1 
+            xm = self.x - 1
         else:
             xm = x - 1
 
@@ -73,7 +71,7 @@ class DLA_diff3d():
                         # save values to compute the change in value for one iteration
                         original_val = self.c[i][j][k]
                         new_val = self.SOR(i, j, k)
-      
+
                         if new_val > 0:
                             self.c[i][j][k] = new_val
                         else:
@@ -88,8 +86,8 @@ class DLA_diff3d():
                 if deltamax < self.eps:
                     self.converged = True
 
-
     # take a growth step
+
     def growth(self, creation_time):
         # variables to determine to which point is being grown
         c_sum = 0
@@ -111,60 +109,60 @@ class DLA_diff3d():
                 break
         self.converged = False
 
-# parameter that controls the shape of the cluster. Higher -> more stretched out
-eta = 4
-x, y, z = [40, 60, 40]
 
+# This if statement (you will see it alot in python files)
+# prevents any code within it from running when importing the file
+# otherwise whenever someone imports this, all this code would run.
+# it will now only run this code when you explicitly run this file with 'python diff3d.py'
+if __name__ == "__main__":
+    t1 = time.time()
+    # parameter that controls the shape of the cluster. Higher -> more stretched out
+    eta = 4
+    x, y, z = [40, 60, 40]
 
-dla_diffusion = DLA_diff3d(seed=[x//2, x - 1], x = x, y = y, z = z, eta=eta, w = 1)
-while dla_diffusion.converged == False:
-    dla_diffusion.update()
-
-for t in range(150):
-    if t % 10 == 0:
-        print(t)
-    dla_diffusion.growth(t + 1)
-
-    while (dla_diffusion.converged == False):
+    dla_diffusion = DLA_diff3d(seed=[x//2, y - 1, z//2], x=x, y=y, z=z, eta=eta, w=1)
+    while dla_diffusion.converged == False:
         dla_diffusion.update()
 
+    for t in range(150):
+        if t % 10 == 0:
+            print(t)
+        dla_diffusion.growth(t + 1)
 
-# fig, ax = plt.subplots(1, 1)
+        while (dla_diffusion.converged == False):
+            dla_diffusion.update()
 
-# side = np.zeros((y, z))
-# for i in range(x):
-#     for j in range(y):
-#         for k in range(z):
-#             if dla_diffusion.cluster[i][j][k] == 1:
-#                 print(1 - (abs(i - x//2)/x), i, x//2)
-#                 side[j][k] += 1 * (1 - (abs(i - x//2)) / x)
-# ax.imshow(side)
+    # fig, ax = plt.subplots(1, 1)
 
-# plot slices
+    # side = np.zeros((y, z))
+    # for i in range(x):
+    #     for j in range(y):
+    #         for k in range(z):
+    #             if dla_diffusion.cluster[i][j][k] == 1:
+    #                 print(1 - (abs(i - x//2)/x), i, x//2)
+    #                 side[j][k] += 1 * (1 - (abs(i - x//2)) / x)
+    # ax.imshow(side)
 
-t2 = time.time()
-print(t2-t1, "TIME")
+    # plot slices
 
-dla_diffusion.tree.plot()
+    t2 = time.time()
+    print(t2-t1, "TIME")
 
-# for i in range(x):
-#     for j in range(y):
-#         for k in range(z):
-#             if dla_diffusion.cluster[i][j][k] == 1:
-#                 dla_diffusion.c[i][j][k] = float('nan')
+    dla_diffusion.tree.plot()
 
-# fig, ax = plt.subplots(3, 2, figsize = (8, 8), constrained_layout = True)
-# axs = ax.flatten()
-# axs[0].imshow(dla_diffusion.c[x//2])
-# axs[1].imshow(dla_diffusion.c[x//2 + 1])
-# axs[2].imshow(dla_diffusion.c[x//2 + 2])
-# axs[3].imshow(dla_diffusion.c[x//2 + 3])
-# axs[4].imshow(dla_diffusion.c[x//2 - 1])
-# axs[5].imshow(dla_diffusion.c[x//2 - 2])
+    # for i in range(x):
+    #     for j in range(y):
+    #         for k in range(z):
+    #             if dla_diffusion.cluster[i][j][k] == 1:
+    #                 dla_diffusion.c[i][j][k] = float('nan')
 
+    # fig, ax = plt.subplots(3, 2, figsize = (8, 8), constrained_layout = True)
+    # axs = ax.flatten()
+    # axs[0].imshow(dla_diffusion.c[x//2])
+    # axs[1].imshow(dla_diffusion.c[x//2 + 1])
+    # axs[2].imshow(dla_diffusion.c[x//2 + 2])
+    # axs[3].imshow(dla_diffusion.c[x//2 + 3])
+    # axs[4].imshow(dla_diffusion.c[x//2 - 1])
+    # axs[5].imshow(dla_diffusion.c[x//2 - 2])
 
-
-
-
-
-plt.show()
+    plt.show()

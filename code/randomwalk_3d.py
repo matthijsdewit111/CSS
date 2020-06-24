@@ -97,7 +97,7 @@ class C():
 
         # create list of walkers
         walker_p = []
-        for w in range(1):
+        for w in range(10):
             rndm1 = random.randrange(self.N)
             rndm2 = random.randrange(self.N)
             walker = [rndm2, 0, rndm1]
@@ -129,6 +129,7 @@ class C():
                             x = random.random()
                             if x > p_stick:
                                 self.tree.add([i, j, k], creation_time)
+                                candidates = self.tree.growth_candidates()
                                 no_match = False
                                 self.walking = False
                                 break
