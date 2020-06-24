@@ -37,6 +37,25 @@ class Node:
         if len(self.child_nodes) == 0:
             self.is_leaf = True
 
+    def get_branch_orders(self, order, orders_list):
+        if self.is_leaf:
+            return []
+
+        n_children = len(self.child_nodes)
+
+        if n_children == 1:
+            if self.parent_node == None:  # root case
+                return [0] + self.child_nodes[0].get_branch_orders(order, orders_list)
+            return self.child_nodes[0].get_branch_orders(order, orders_list)
+
+        if n_children > 1:
+            new_order = order + 1
+            new_orders = []
+            for child in self.child_nodes:
+                new_orders += [new_order] + child.get_branch_orders(new_order, orders_list)
+
+            return orders_list + new_orders
+
     def get_A_ps(self):
         if self.is_leaf:
             return []
@@ -62,8 +81,8 @@ class Node:
         if n_children > 2:
             # we can only compare pairs
             # so we split them up and assign pairs randomly
-            
-            random.shuffle(self.child_nodes) # hopefully this doesn't mess things up
+
+            random.shuffle(self.child_nodes)  # hopefully this doesn't mess things up
 
             new_A_ps = []
             total_leafs_sub_tree1 = self.child_nodes[0].get_number_of_leafs()
@@ -72,7 +91,7 @@ class Node:
                 A_p = self.calculate_A_p(total_leafs_sub_tree1, total_leafs_sub_tree2)
                 new_A_ps.append(A_p)
                 total_leafs_sub_tree1 += total_leafs_sub_tree2
-            
+
             return A_ps + new_A_ps
 
     @staticmethod
@@ -102,7 +121,7 @@ class Node:
 
 
 class Tree:
-    def __init__(self, root_coords, bounds=[[0, 10], [0, 10], [0, 10]], p = 0.4, PS = 40):
+    def __init__(self, root_coords, bounds=[[0, 10], [0, 10], [0, 10]], p=0.4, PS=40):
         self._root = Node(root_coords, 0, None)
         self._node_list = [self._root]
         self._coords_list = [root_coords]
@@ -111,8 +130,8 @@ class Tree:
         self._matrix_form[tuple(root_coords)] = 1
         self.bounds = bounds
         self.system_time = 0
-        self.PS = PS
         self.p = p
+        self.PS = PS
 
     def plot(self):
         if self._dimensionality == 2:
@@ -198,6 +217,9 @@ class Tree:
     def get_asymmetry_index(self):
         A_ps = self._root.get_A_ps()
         return (1/len(A_ps)) * sum(A_ps)
+
+    def get_branch_orders(self):
+        return self._root.get_branch_orders(0, [])
 
     def _get_neighbour_coords(self, coords):
         # calculate coords of all neighbours (Moore neighborhood) around a center coord
@@ -300,7 +322,8 @@ if __name__ == "__main__":
     tree2d.add([3, 2], 3)
     tree2d.add([2, 3], 4)
     tree2d.add([4, 3], 5)
-    print(tree2d.get_asymmetry_index())
+    tree2d.add([6, 0], 6)
+    print(tree2d.get_branch_orders())
     tree2d.plot()
 
     # # plot a 3d test tree
