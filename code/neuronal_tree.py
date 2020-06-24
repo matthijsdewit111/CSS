@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
-rng = np.random.default_rng()
+# rng = np.random.default_rng()
 
 """
 Currently not fully working or implemented
@@ -151,7 +151,7 @@ class Tree:
         assert len(coords) == self._dimensionality
 
         # assign a random parent in range to the new node
-        parent = rng.choice(self._get_neighbour_nodes(coords))
+        parent = np.random.choice(self._get_neighbour_nodes(coords))
         new_node = parent.add_child(coords, creation_time)
 
         self.system_time = creation_time
