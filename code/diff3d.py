@@ -12,7 +12,7 @@ from neuronal_tree import Tree
 
 class DLA_diff3d():
     # the diffusion class. Owns a DLA_diff3d.c which is the matrix with all the information
-    def __init__(self, seed, eps=10**-5, x=20, y=20, z=20, w=1, eta=1):
+    def __init__(self, seed, eps=10**-5, x=20, y=20, z=20, w=1, eta=1, PS = 40):
         self.x = x
         self.y = y
         self.z = z
@@ -28,7 +28,7 @@ class DLA_diff3d():
         self.eps = eps
         self.converged = False
 
-        self.tree = Tree(seed, bounds=[[0, x], [0, y], [0, z]])
+        self.tree = Tree(seed, bounds=[[0, x], [0, y], [0, z]], PS = PS)
 
     # compute the neighbours in x and z direction, accounting for periodic boundaries
 

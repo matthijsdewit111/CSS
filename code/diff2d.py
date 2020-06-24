@@ -9,12 +9,16 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from neuronal_tree import Tree
 
-t1 = time.time()
+"""
+Sometimes convergence is not reached. This typically occurs when the system is relatively
+short compared to the cluster. This can be resolved by making y larger or by decreasing
+eps in class.
+"""
 
 
 class DLA_diff2d():
     # the diffusion class. Owns a DLA_diff3d.c which is the matrix with all the information
-    def __init__(self, seed, eps=10**-8, x = 20, y = 20, w=1, eta=1):
+    def __init__(self, seed, eps=10**-6, x = 20, y = 20, w=1, eta=1, PS = 40):
         self.x = x
         self.y = y
         self.dx = 1/x
@@ -28,7 +32,7 @@ class DLA_diff2d():
         self.eps = eps
         self.converged = False 
 
-        self.tree = Tree(seed, bounds = [[0, x], [0, y]])
+        self.tree = Tree(seed, bounds = [[0, x], [0, y]], PS = PS)
 
 
     # compute the neighbours in x and z direction, accounting for periodic boundaries
@@ -70,6 +74,7 @@ class DLA_diff2d():
                     delta = abs(new_val - original_val)
                     if delta > deltamax:
                         deltamax = delta
+
                 else:
                     self.c[i][j] = 0
 
@@ -99,34 +104,44 @@ class DLA_diff2d():
                 break
         self.converged = False
 
-# parameter that controls the shape of the cluster. Higher -> more stretched out
-eta = 1
-x, y = [50, 80]
+
+if __name__ == "__main__":
+    t1 = time.time()
+    # parameter that controls the shape of the cluster. Higher -> more stretched out
+    eta = 1
+    x, y = [70, 150]
 
 
-dla_diffusion = DLA_diff2d(seed=[x//2, y - 1], x = x, y = y, eta=eta, w = 1)
-while dla_diffusion.converged == False:
-    dla_diffusion.update()
-
-for t in range(200):
-    if t % 10 == 0:
-        print(t)
-    dla_diffusion.growth(t + 1)
-
-    while (dla_diffusion.converged == False):
+    dla_diffusion = DLA_diff2d(seed=[x//2, y - 1], x = x, y = y, eta=eta, w = 1)
+    while dla_diffusion.converged == False:
         dla_diffusion.update()
 
+    for t in range(400):
+        if t % 10 == 0:
+            print(t)
+        dla_diffusion.growth(t + 1)
 
-t2 = time.time()
-print(t2-t1, "TIME")
-for i in range(x):
-    for j in range(y):
-        if [i, j] in dla_diffusion.tree:
-            dla_diffusion.c[i][j] = float('nan')
-
-plt.imshow(np.transpose(dla_diffusion.c)[::-1])
-dla_diffusion.tree.plot()
+        while (dla_diffusion.converged == False):
+            dla_diffusion.update()
 
 
+    t2 = time.time()
+    print(t2-t1, "TIME")
+    for i in range(x):
+        for j in range(y):
+            if [i, j] in dla_diffusion.tree:
+                dla_diffusion.c[i][j] = float('nan')
 
-plt.show()
+
+    
+    reoriented_concentrations = np.transpose(dla_diffusion.c)[::-1]
+
+    gradient = reoriented_concentrations
+    # gradient = np.sqrt(reoriented_concentrations)
+
+    plt.imshow(gradient)
+    dla_diffusion.tree.plot()
+
+
+
+    plt.show()

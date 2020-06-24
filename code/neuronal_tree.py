@@ -102,7 +102,7 @@ class Node:
 
 
 class Tree:
-    def __init__(self, root_coords, bounds=[[0, 10], [0, 10], [0, 10]]):
+    def __init__(self, root_coords, bounds=[[0, 10], [0, 10], [0, 10]], p = 0.4, PS = 40):
         self._root = Node(root_coords, 0, None)
         self._node_list = [self._root]
         self._coords_list = [root_coords]
@@ -111,6 +111,8 @@ class Tree:
         self._matrix_form[tuple(root_coords)] = 1
         self.bounds = bounds
         self.system_time = 0
+        self.PS = PS
+        self.p = p
 
     def plot(self):
         if self._dimensionality == 2:
@@ -120,7 +122,7 @@ class Tree:
         else:
             raise NotImplementedError
 
-    def prune(self, p, PS):
+    def prune(self):
         # remove the nodes, created between 5 and PS timesteps ago
         # with a probability p
 
@@ -128,13 +130,13 @@ class Tree:
         # leafs that meet the requirements
         for node in self:
             if node.is_leaf:
-                if self.system_time - 5 > node.creation_time > self.system_time - PS:
+                if self.system_time - 5 > node.creation_time > self.system_time - self.PS:
                     leafs.append(node)
 
         # remove the nodes with chance p
         for node in leafs:
             rndm = random.random()
-            if rndm < p:
+            if rndm < self.p:
                 # print("node will be removed:", node)
                 parent = node.parent_node
 
@@ -158,7 +160,7 @@ class Tree:
         self._coords_list.append(coords)
         self._matrix_form[tuple(coords)] = 1
 
-        self.prune(0.4, 40)
+        self.prune()
 
         return new_node
 
