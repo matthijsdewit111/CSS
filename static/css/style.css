@@ -72,3 +72,19 @@ body {
     top: 70px;
     background-color: white;
 }
+
+.hyp-item-red:hover {
+  background-color: red;
+  /* padding: 16px; */
+  border-radius: 10px;
+  color: white;
+
+}
+
+.hyp-item-green:hover {
+  background-color: green;
+  /* padding: 16px; */
+  border-radius: 10px;
+  color: white;
+
+}
