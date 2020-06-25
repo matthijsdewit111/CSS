@@ -8,14 +8,23 @@ from tqdm import tqdm
 from neuronal_tree import Tree
 
 
-class C():
-    # the diffusion class. Owns a C.c which is the matrix with all the information
-    def __init__(self, seed, N, PS=40):
-        self.N = N
-        self.dx = 1/N
-        self.c = [[[0 for i in range(N)] for j in range(N)] for k in range(N)]
+class randomwalk_3D():
+    """
+    The random walker DLA model. Owns an attribute c which is the matrix with all the information.
+    """
+    def __init__(self, seed, x = 50, y = 50, z = 50, PS = 40):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.dx = 1 / x
         self.walking = True
-        self.tree = Tree(seed, bounds=[[0, N], [0, N], [0, N]], PS=PS)
+        self.tree = Tree(seed, bounds = [[0, x], [0, y], [0, z]], PS = PS)
+
+        # initialize the space to a gradient from 1 to 0
+        self.c = np.zeros((x, y, z))
+        for i in range(x):
+            for j in range(y):
+                self.c[i][j] = [1 - j / (y - 1) for k in range(z)]
 
         self.transformations = {
             0: self.up,
@@ -36,7 +45,7 @@ class C():
         new_walker_p = walker_p.copy()
         new_walker_p[1] += 1
 
-        if new_walker_p[1] > self.N - 1:
+        if new_walker_p[1] > self.y - 1:
             # respawn at Y=0 when moving past Y_max
             new_walker_p[1] = 0
 
@@ -95,9 +104,9 @@ class C():
 
         # create list of walkers
         walker_p = []
-        for w in range(10):
-            rndm1 = random.randrange(self.N)
-            rndm2 = random.randrange(self.N)
+        for w in range(150):
+            rndm1 = random.randrange(self.x)
+            rndm2 = random.randrange(self.z)
             walker = [rndm2, 0, rndm1]
             walker_p.append(walker)
 
@@ -138,21 +147,16 @@ class C():
 if __name__ == "__main__":
     t1 = time.time()
 
-    N = 70
+    x, y, z = [40, 60, 40]
 
     # controls the chance of the random walker sticking to the cluster
     # higher means lower chance
     p_stick = 0
-    # fig, axs = plt.subplots(1, 1)
 
-<<<<<<< HEAD
-c = C(seed=[N//2, N - 1, N//2], N=N, PS=40)
-=======
-    c = C(seed=[N//2, N - 1, N//2], N=N)
->>>>>>> 631e4cd7e9038dd2c1c35b28999e4ea80909842f
+    c = randomwalk_3D(seed=[x // 2, y - 1, z // 2], x = x, y = y, z = z)
 
     # number of points
-    for i in tqdm(range(500)):
+    for i in tqdm(range(150)):
         while (c.walking == True):
             c.walker(p_stick, i + 1)
         c.walking = True
@@ -163,33 +167,6 @@ c = C(seed=[N//2, N - 1, N//2], N=N, PS=40)
         c.c[i][j][k] = float('nan')
 
     t2 = time.time()
-    print(t2-t1, "TIME")
+    print(t2 - t1, "TIME")
 
     c.tree._plot3d()
-
-    # 3D plotting
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-
-    for node in c.tree:
-        list_of_point = node.coords
-        ax.scatter(list_of_point[0], list_of_point[1], list_of_point[2])
-
-    ax.axes.set_xlim3d(left=0, right=N)
-    ax.axes.set_ylim3d(bottom=0, top=N)
-    ax.axes.set_zlim3d(bottom=0, top=N)
-    plt.show()
-
-    # 2D plotting
-    c_list = [[0 for i in range(N)] for j in range(N)]
-
-    for node in c.tree:
-        i, j, k = node.coords
-        c_list[i][j] = float('nan')
-
-    fig, axs = plt.subplots(1, 1)
-    axs.imshow(c_list, cmap='cubehelix')
-    axs.set_title("P stick : {}".format(p_stick))
-    axs.set_xlabel("x position [-]")
-    axs.set_ylabel("y position [-]")
-    plt.show()
