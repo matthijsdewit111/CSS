@@ -8,14 +8,19 @@ from tqdm import tqdm
 from neuronal_tree import Tree
 
 
-class C():
+class randomwalk_2D():
     # the diffusion class. Owns a C.c which is the matrix with all the information
-    def __init__(self, seed, N):
-        self.N = N
-        self.dx = 1/N
-        self.c = [[[0 for i in range(N)] for j in range(N)]]
+    def __init__(self, seed, x = 50, y = 50, PS = 40):
+        self.x = x
+        self.y = y
+        self.dx = 1 / x
         self.walking = True
-        self.tree = Tree(seed, bounds=[[0, N], [0, N]])
+        self.tree = Tree(seed, bounds=[[0, x], [0, y]], PS = PS)
+
+        # initialize the space to a gradient from 1 to 0
+        self.c = np.zeros((x, y))
+        for i in range(x):
+            self.c[i] = [1 - j/(y - 1) for j in range(y)]
 
         self.transformations = {
             0: self.up,
@@ -34,7 +39,7 @@ class C():
         new_walker_p = walker_p.copy()
         new_walker_p[1] += 1
 
-        if new_walker_p[1] > self.N - 1:
+        if new_walker_p[1] > self.y - 1:
             # respawn at Y=0 when moving past Y_max
             new_walker_p[1] = 0
 
@@ -75,7 +80,7 @@ class C():
         # create list of walkers
         walker_p = []
         for w in range(1):
-            rndm = random.randrange(self.N)
+            rndm = random.randrange(self.x)
             walker = [rndm, 0]
             walker_p.append(walker)
 
@@ -114,35 +119,32 @@ class C():
 
 if __name__ == "__main__":
     t1 = time.time()
-    
-    N = 100
+
+    x, y = [40, 80]
 
     # controls the chance of the random walker sticking to the cluster
     # higher means lower chance
     p_stick = 0
-    # fig, axs = plt.subplots(1, 1)
 
-    c = C(seed=[N//2, N - 1], N=N)
+    PS = 30
+
+    DLA = randomwalk_2D(seed=[x // 2, y - 1], x = x, y = y, PS = PS)
 
     # number of points
-    for i in tqdm(range(500)):
-        while (c.walking == True):
-            c.walker(p_stick, i + 1)
-        c.walking = True
+    for i in tqdm(range(150)):
+        while (DLA.walking == True):
+            DLA.walker(p_stick, i + 1)
+        DLA.walking = True
 
     t2 = time.time()
     print(t2-t1, "TIME")
 
+    # convert data for plotting
+    for i in range(x):
+        for j in range(y):
+            if [i, j] in DLA.tree:
+                DLA.c[i][j] = float('nan')
+
     # 2D plotting
-    c_list = [[0 for i in range(N)] for j in range(N)]
-
-    for node in c.tree:
-        i, j = node.coords
-        c_list[i][j] = float(1)
-
-    fig, axs = plt.subplots(1, 1)
-    axs.imshow(c_list, cmap='cubehelix')
-    axs.set_title("P stick : {}".format(p_stick))
-    axs.set_xlabel("x position [-]")
-    axs.set_ylabel("y position [-]")
+    DLA.tree.plot()
     plt.show()
