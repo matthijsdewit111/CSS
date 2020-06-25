@@ -33,13 +33,13 @@ class Node:
     def get_nodes_in_terminal_branch(self):
         if self.is_leaf:
             return [self]
-        
+
         # recurse to get all 'above'
         nodes_in_terminal_branch = []
         for child in self.child_nodes:
             for node in child.get_nodes_in_terminal_branch():
                 nodes_in_terminal_branch.append(node)
-        
+
         if len(self.child_nodes) == 1 and self.child_nodes[0] in nodes_in_terminal_branch:
             return nodes_in_terminal_branch + [self]
         else:
@@ -239,7 +239,7 @@ class Tree:
         nodes_in_terminal_branch = len(self._root.get_nodes_in_terminal_branch())
         intermidiate_nodes = total_nodes - nodes_in_terminal_branch
         return nodes_in_terminal_branch / intermidiate_nodes
-    
+
     def get_number_of_terminal_segments(self):
         # just count number of leafs
         number_of_terminal_segments = 0
@@ -349,6 +349,8 @@ class Tree:
         #         ax.plot3D([parent.coords[0], node.coords[0]], [parent.coords[1], node.coords[1]], [parent.coords[2], node.coords[2]], c='red', alpha = 0.4)
 
         plt.show()
+
+        return ax
 
     def __len__(self):
         return len(self._node_list)
