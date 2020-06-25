@@ -67,3 +67,8 @@ body {
   padding: 16px;
   border-radius: 10px;
 }
+
+.sticky-offset {
+    top: 70px;
+    background-color: white;
+}

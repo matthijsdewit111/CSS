@@ -33,10 +33,10 @@
         <a class="nav-link" href="theory.html">Theory</a>
       </li>
       <li class="navbar-brand">
-        <a class="nav-link white" href="#">Model</a>
+        <a class="nav-link" href="model.html">Model</a>
       </li>
       <li class="navbar-brand">
-        <a class="nav-link" href="experiment.html">Experiment</a>
+        <a class="nav-link white" href="#">Experiment</a>
       </li>
       <li class="navbar-brand">
         <a class="nav-link" href="results.html">Results</a>
@@ -50,93 +50,82 @@
 
 <!-- Page content -->
 <br><br>
-<h1 class="text-center">Computational model</h1>
+<h1 class="text-center">Experiment</h1>
 <br>
 
 <hr style="width:50%;">
 
-<div class="row">
 
+
+<!-- <div class="row">
   <div class="col-md-2"></div>
-  <div class="col-md-5"><br>
-    <h3>Random walk condition</h3>
+  <div class="col-md-4 text-center"><br>
+    <h4>2D</h4>
     <ul>
-      <li># of random walkers</li>
-      <li>Periodic boundary conditions</li>
-      <li>Iterations / stopping condition</li>
-      <li></li>
+      <li>Grid size: 40x60</li>
     </ul>
   </div>
-  <div class="col-md-3">
-    <br>
-    <img src="https://reference.wolfram.com/language/example/Files/ConstructARandomWalkIn2DAnd3D.en/O_2.png" alt="dla" width="200px" height="200px"></img>
-    <br><br>
-  </div>
-  <div class="col-md-2"></div>
-</div>
-
-<hr style="width:50%;">
-<div class="row">
-
-  <div class="col-md-2"></div>
-  <div class="col-md-3">
-    <br>
-    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Flogancollinsblog.files.wordpress.com%2F2017%2F11%2Feq48.png%3Fw%3D397%26h%3D234&f=1&nofb=1" alt="dla" width="200px" height="120px"></img>
-    <br>
-  </div>
-  <div class="col-md-5"><br>
-    <h3>Diffusion condition</h3>
+  <div class="col-md-4 text-center"><br>
+    <h4>3D</h4>
     <ul>
-      <li>Periodic boundary conditions</li>
-      <li></li>
-      <li></li>
-      <li></li>
+      <li>Grid size: 40x60</li>
     </ul>
-  </div>
-  <div class="col-md-2"></div>
-</div>
-
-<!-- <hr style="width:50%;">
-<div class="row">
-
-  <div class="col-md-2"></div>
-  <div class="col-md-5"><br>
-    <h3>Boundary conditions</h3>
-    <ul>
-      <li>Periodic</li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-  </div>
-  <div class="col-md-3">
-    <br>
-    <img src="" alt="dla" width="200px" height="200px"></img>
   </div>
   <div class="col-md-2"></div>
 </div> -->
 
-<hr style="width:70%;">
-<br>
 <div class="row">
+  <div class="col-md-4"></div>
+  <div class="col-md-4 text-center">
+    <h4>Conditions</h4>
+    <p>Diffusion in 2D & 3D, Random Walker in 2D & 3D</p>
+    <br>
+    <h4>Simulations</h4>
+    <p>5 simulations per condition (n=5)</p>
+    <br>
+  </div>
+  <div class="col-md-4"></div>
+</div>
 
-  <div class="col-md-2"></div>
-  <div class="col-md-5">
-    <h3>Pruning branches</h3>
+<div class="row">
+  <div class="col-md-4"></div>
+  <div class="col-md-4 grey-box">
+    <h4>Parameters</h4>
     <ul>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
+      <li>Grid size: 40x60 (2D) & 40x60x40 (3D)</li>
+      <li>Iterations: 150</li>
+      <li>Pruning span: [10, 20, 30, 40, 50]</li>
+      <li>Pruning probability: 0.4</li>
     </ul>
   </div>
+  <div class="col-md-4"></div>
+</div>
+<br>
+
+<hr style="width:70%;">
+<br>
+<h1 class="text-center">Analysis</h1>
+<br>
+<hr style="width:70%;">
+
+<div class="row">
+  <div class="col-md-2"></div>
   <div class="col-md-3">
-    <img src="https://github.com/matthijsdewit111/CSS/blob/master/static/img/leafs.jpg?raw=true" alt="dla" width="330px" height="230px"></img>
     <br>
+    <img src="https://www.mbfbioscience.com/help/nx11/Content/images/image19.jpg" alt="dla" width="170px" height="200px"></img>
+    <br><br>
+  </div>
+  <div class="col-md-5">
+    <br>
+    <ul>
+      <li>Branch order</li>
+      <li>Fractal dimension</li>
+      <li>Amount of terminal leafs</li>
+      <li>Asymmetry index</li>
+    </ul>
   </div>
   <div class="col-md-2"></div>
 </div>
-
 
 <!-- Footer -->
 <footer class="center jumbotron page-footer font-small mdb-color lighten-3 pt-4">
