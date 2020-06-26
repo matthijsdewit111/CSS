@@ -1,5 +1,4 @@
 import random
-
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
@@ -379,11 +378,11 @@ if __name__ == "__main__":
     print(tree2d.get_number_of_terminal_segments())
     tree2d.plot()
 
-    # # plot a 3d test tree
-    # tree3d = Tree([0, 0, 0], bounds=[[0, 10], [0, 10], [0, 10]])
-    # tree3d.add([0, 1, 0], 1)
-    # tree3d.add([1, 1, 0], 2)
-    # tree3d.add([9, 1, 0], 3)
-    # tree3d.add([9, 2, 0], 4)
-    # tree3d.add([9, 2, 9], 5)
-    # tree3d.plot()
+    # plot a 3d test tree
+    tree3d = Tree([0, 0, 0], bounds=[[0, 10], [0, 10], [0, 10]])
+    tree3d.add([0, 1, 0], 1)
+    tree3d.add([1, 1, 0], 2)
+    tree3d.add([9, 1, 0], 3)
+    tree3d.add([9, 2, 0], 4)
+    tree3d.add([9, 2, 9], 5)
+    tree3d.plot()

@@ -145,6 +145,7 @@ class randomwalk_3D():
 
 
 if __name__ == "__main__":
+    
     t1 = time.time()
 
     x, y, z = [40, 60, 40]

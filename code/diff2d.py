@@ -30,7 +30,7 @@ class DLA_diff2d():
         self.w = w
         self.eta = eta
         self.eps = eps
-        self.converged = False 
+        self.converged = False
 
         self.tree = Tree(seed, bounds = [[0, x], [0, y]], PS = PS)
 
@@ -43,7 +43,7 @@ class DLA_diff2d():
             xp = 0
 
         if x - 1 < 0:
-            xm = self.x - 1 
+            xm = self.x - 1
         else:
             xm = x - 1
 
@@ -65,7 +65,7 @@ class DLA_diff2d():
                     # save values to compute the change in value for one iteration
                     original_val = self.c[i][j]
                     new_val = self.SOR(i, j)
-  
+
                     if new_val > 0:
                         self.c[i][j] = new_val
                     else:
@@ -106,11 +106,12 @@ class DLA_diff2d():
 
 
 if __name__ == "__main__":
+
     t1 = time.time()
+    
     # parameter that controls the shape of the cluster. Higher -> more stretched out
     eta = 1
     x, y = [70, 150]
-
 
     dla_diffusion = DLA_diff2d(seed=[x//2, y - 1], x = x, y = y, eta=eta, w = 1)
     while dla_diffusion.converged == False:
@@ -132,8 +133,6 @@ if __name__ == "__main__":
             if [i, j] in dla_diffusion.tree:
                 dla_diffusion.c[i][j] = float('nan')
 
-
-    
     reoriented_concentrations = np.transpose(dla_diffusion.c)[::-1]
 
     gradient = reoriented_concentrations
@@ -141,7 +140,5 @@ if __name__ == "__main__":
 
     plt.imshow(gradient)
     dla_diffusion.tree.plot()
-
-
 
     plt.show()

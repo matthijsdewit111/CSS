@@ -21,12 +21,20 @@ simulated various types of dendritic neurons in 3D using DLA.
 
 ## Files
 ### Data structure
-* ```neuronal_tree.py``` contains the Tree and Node classes to represent the dendrite structure
+* ```neuronal_tree.py``` contains the Tree and Node classes to represent the dendrite structure, is called by the DLA models
 
 ### DLA models
 * ```diff2d.py``` and ```diff3d.py``` are the DLA model with diffusion in 2D and 3D, respectively
 * ```randomwalk_2d.py``` and ```randomwalk_3d.py``` are the DLA model with the random walker in 2D and 3D, respectively
 
+### Analysis
+* ```fractal-dim.ipynb``` calculates the fractal dimension of the 2D model output, this was not used in the results
+* ```analysisdiff.ipynb``` runs and analyses the diffusion condition over 20 simulations (n=20)
+* ```analysis_randomwalker.ipynb``` runs and analyses the random walker condition over 5 simulations (n=5)
+
+### Visualisation
+* ```visualisation.ipynb``` is used to create the output shapes of the 2D and 3D conditions (picture and gif, respectively)
+
 ## How to run
 * Run either one of the four DLA models to run one simulation and plot the outcome in 2D or 3D.
-* To perform the analysis, run the ```analysis.ipynb``` for the diffusion condition, and ```analysis_randomwalker.ipynb``` for the randomwalker condition
+* To perform the analysis, run either one of the analysis files
