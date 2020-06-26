@@ -1,4 +1,6 @@
-# Coen Lenting
+# CSS group 11
+
+# 3d dla based on the steady state solution of the diffusion eqution
 
 import random
 import time
@@ -103,21 +105,17 @@ class DLA_diff3d():
         for i, j, k in candidates:
             combined_c += (self.c[i][j][k] ** self.eta)
             if (combined_c / c_sum) > rndm:
-
                 self.tree.add([i, j, k], creation_time)
-
                 break
+                
         self.converged = False
 
 
-# This if statement (you will see it alot in python files)
-# prevents any code within it from running when importing the file
-# otherwise whenever someone imports this, all this code would run.
-# it will now only run this code when you explicitly run this file with 'python diff3d.py'
+
 if __name__ == "__main__":
     t1 = time.time()
     # parameter that controls the shape of the cluster. Higher -> more stretched out
-    eta = 4
+    eta = 1
     x, y, z = [40, 60, 40]
 
     dla_diffusion = DLA_diff3d(seed=[x//2, y - 1, z//2], x=x, y=y, z=z, eta=eta, w=1)
@@ -132,38 +130,9 @@ if __name__ == "__main__":
         while (dla_diffusion.converged == False):
             dla_diffusion.update()
 
-    # fig, ax = plt.subplots(1, 1)
-
-    # side = np.zeros((y, z))
-    # for i in range(x):
-    #     for j in range(y):
-    #         for k in range(z):
-    #             if dla_diffusion.cluster[i][j][k] == 1:
-    #                 print(1 - (abs(i - x//2)/x), i, x//2)
-    #                 side[j][k] += 1 * (1 - (abs(i - x//2)) / x)
-    # ax.imshow(side)
-
-    # plot slices
-
     t2 = time.time()
     print(t2-t1, "TIME")
-    print(dla_diffusion.tree.get_asymmetry_index())
 
     dla_diffusion.tree.plot()
-
-    # for i in range(x):
-    #     for j in range(y):
-    #         for k in range(z):
-    #             if dla_diffusion.cluster[i][j][k] == 1:
-    #                 dla_diffusion.c[i][j][k] = float('nan')
-
-    # fig, ax = plt.subplots(3, 2, figsize = (8, 8), constrained_layout = True)
-    # axs = ax.flatten()
-    # axs[0].imshow(dla_diffusion.c[x//2])
-    # axs[1].imshow(dla_diffusion.c[x//2 + 1])
-    # axs[2].imshow(dla_diffusion.c[x//2 + 2])
-    # axs[3].imshow(dla_diffusion.c[x//2 + 3])
-    # axs[4].imshow(dla_diffusion.c[x//2 - 1])
-    # axs[5].imshow(dla_diffusion.c[x//2 - 2])
 
     plt.show()
