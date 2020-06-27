@@ -29,4 +29,4 @@ simulated various types of dendritic neurons in 3D using DLA.
 
 ## How to run
 * Run either one of the four DLA models to run one simulation and plot the outcome in 2D or 3D.
-* To perform the analysis, run the ```analysis.ipynb``` for the diffusion condition, and ```analysis_randomwalker.ipynb``` for the randomwalker condition
+* To perform the analysis, run the ```analysisdiff.ipynb``` for the diffusion condition, and ```analysis_randomwalker.ipynb``` for the randomwalker condition
