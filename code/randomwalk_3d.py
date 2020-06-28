@@ -145,7 +145,7 @@ class randomwalk_3D():
 
 
 if __name__ == "__main__":
-    
+
     t1 = time.time()
 
     x, y, z = [40, 60, 40]
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     c = randomwalk_3D(seed=[x // 2, y - 1, z // 2], x = x, y = y, z = z)
 
     # number of points
-    for i in tqdm(range(150)):
+    for i in tqdm(range(40)):
         while (c.walking == True):
             c.walker(p_stick, i + 1)
         c.walking = True

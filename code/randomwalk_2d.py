@@ -131,7 +131,7 @@ if __name__ == "__main__":
     DLA = randomwalk_2D(seed=[x // 2, y - 1], x = x, y = y, PS = PS)
 
     # number of points
-    for i in tqdm(range(150)):
+    for i in tqdm(range(50)):
         while (DLA.walking == True):
             DLA.walker(p_stick, i + 1)
         DLA.walking = True
