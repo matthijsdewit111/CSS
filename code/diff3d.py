@@ -1,4 +1,6 @@
-# Coen Lenting
+# CSS group 11
+
+# 3d dla based on the steady state solution of the diffusion eqution
 
 import random
 import time
@@ -103,19 +105,17 @@ class DLA_diff3d():
         for i, j, k in candidates:
             combined_c += (self.c[i][j][k] ** self.eta)
             if (combined_c / c_sum) > rndm:
-
                 self.tree.add([i, j, k], creation_time)
-
                 break
-        self.converged = False
 
+        self.converged = False
 
 if __name__ == "__main__":
 
     t1 = time.time()
 
     # parameter that controls the shape of the cluster. Higher -> more stretched out
-    eta = 4
+    eta = 1
     x, y, z = [40, 60, 40]
 
     dla_diffusion = DLA_diff3d(seed=[x//2, y - 1, z//2], x=x, y=y, z=z, eta=eta, w=1)
@@ -132,7 +132,6 @@ if __name__ == "__main__":
 
     t2 = time.time()
     print(t2-t1, "TIME")
-    print(dla_diffusion.tree.get_asymmetry_index())
 
     dla_diffusion.tree.plot()
 
