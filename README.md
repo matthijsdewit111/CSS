@@ -26,6 +26,7 @@ simulated various types of dendritic neurons in 3D using DLA.
 ### DLA models
 * ```diff2d.py``` and ```diff3d.py``` are the DLA model with diffusion in 2D and 3D, respectively
 * ```randomwalk_2d.py``` and ```randomwalk_3d.py``` are the DLA model with the random walker in 2D and 3D, respectively
+* ```margolus.py``` is a DLA model that is not fully implemented, which was supposed to use a chaotic-rule based approach (like a CA) instead of random walkers
 
 ### Analysis
 * ```fractal-dim.ipynb``` calculates the fractal dimension of the 2D model output, this was not used in the results
